@@ -10,13 +10,31 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
+What things you need to install to get the software running
  
 ```
-You will need the latest version of Python installed on your machine. The software is written in Python 3.7.
+You will need the latest version of Python installed on your machine.
 
 The image encryption uses the Python Image Library, so you will need to install this as well.
-    Here is the link to install PIL: https://pillow.readthedocs.io/en/5.3.x/
+```
+
+### Installing
+
+Installation guide for Padlock
+
+*Installing Python:*
+Main site: *https://www.python.org/*
+```
+You will need the latest version on their site.
+The software is written in Python 3.7
+```
+
+
+*Installing Python Image Library:*
+Main site: *https://pillow.readthedocs.io/en/5.3.x/*
+```
+You will need to use the PIP install method:
+pip install Pillow
 ```
 
 ## Authors
