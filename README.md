@@ -23,6 +23,7 @@ The image encryption uses the Python Image Library, so you will need to install 
 Installation guide for Padlock
 
 *Installing Python:*
+
 Main site: *https://www.python.org/*
 ```
 You will need the latest version on their site.
@@ -31,6 +32,7 @@ The software is written in Python 3.7
 
 
 *Installing Python Image Library:*
+
 Main site: *https://pillow.readthedocs.io/en/5.3.x/*
 ```
 You will need to use the PIP install method:
