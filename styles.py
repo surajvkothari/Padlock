@@ -17,7 +17,10 @@ class Colours:
     CIPHER_FG = "#F9AA33"
     ERROR = "#E30425"
     INFO = "#555"
-    STATUS = "#609f74"
+    STATUS_OK = "#609F74"
+    STATUS_ERROR = "#E30425"
+    STATUS_WAIT = "#F9AA33"
+    GUIDE_LINK = "#3D9ADB"
 
 
 class Fonts:
@@ -101,8 +104,8 @@ class ButtonStyle:
     }
 
     FILE_BUTTON = {
-        "bg": "#e67e22",
-        "activebackground": "#e09655",
+        "bg": "#E67E22",
+        "activebackground": "#E09655",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -127,8 +130,8 @@ class ButtonStyle:
     }
 
     CAESAR_BUTTON = {
-        "bg": "#f0d347",
-        "activebackground": "#fcdd49",
+        "bg": "#F0D347",
+        "activebackground": "#FCDD49",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -140,8 +143,8 @@ class ButtonStyle:
     }
 
     VIGENERE_BUTTON = {
-        "bg": "#08c08c",
-        "activebackground": "#08dda1",
+        "bg": "#08C08C",
+        "activebackground": "#08DDA1",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -153,8 +156,8 @@ class ButtonStyle:
     }
 
     DES_BUTTON = {
-        "bg": "#17a02c",
-        "activebackground": "#1abc33",
+        "bg": "#17A02C",
+        "activebackground": "#1ABC33",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -166,8 +169,8 @@ class ButtonStyle:
     }
 
     TRIPLE_DES_BUTTON = {
-        "bg": "#466aad",
-        "activebackground": "#5981cc",
+        "bg": "#466AAD",
+        "activebackground": "#5981CC",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -179,8 +182,8 @@ class ButtonStyle:
     }
 
     COPY_BUTTON = {
-        "bg": "#3f9adb",
-        "activebackground": "#5981cc",
+        "bg": "#3f9ADB",
+        "activebackground": "#5981CC",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 1,
@@ -192,8 +195,8 @@ class ButtonStyle:
     }
 
     UPLOAD_BUTTON = {
-        "bg": "#3f9adb",
-        "activebackground": "#5981cc",
+        "bg": "#3f9ADB",
+        "activebackground": "#5981CC",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 1,

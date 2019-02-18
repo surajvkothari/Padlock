@@ -2,21 +2,7 @@
 
 import imageCrypt
 
-
-def getPositionInAscii(i):
-    """
-    Returns the ASCII value of a character minus 1.
-    """
-
-    """
-    Returns 126 if character is a (SPACE).
-    In ASCII, (SPACE) is first, however in this shifted ASCII,
-    the first character is a (!) starting at index 1.
-    """
-    if i == " ":
-        return 126
-    else:
-        return ord(i) - 1
+guide_data = {}
 
 
 def getShiftValuesFromPassKey(passKey):
@@ -61,31 +47,46 @@ def getPassKeyString(text, passKey):
     """
     passKeyString = (passKey * repeatedNum) + extraChars
 
+    guide_data['pks_n'] = repeatedNum
+    guide_data['pks_r'] = extraChars
+    guide_data['pks'] = passKeyString
+
     return passKeyString
 
 
 def encryptMessage(plaintext, passKey):
     """Encrypts a plaintext with the passkey"""
 
+    guide_data['fc'] = 'Encryption'
+    guide_data['txt'] = plaintext
+    guide_data['key'] = passKey
+
     cipherText = ""
     passKeyString = getPassKeyString(text=plaintext, passKey=passKey)
 
     # Iterates through the pass-key-string and the plaintext simultaneously
-    for keyChar, plaintextChar in list(zip(passKeyString, plaintext)):
+    for x, (keyChar, plaintextChar) in enumerate(list(zip(passKeyString, plaintext))):
         # Gets the ASCII position for each character in the pass key string
-        shift = getPositionInAscii(keyChar)
+        passKeyString_ASCII = ord(keyChar)
 
         # Gets ASCII value of each plain text character
-        characterASCII = ord(plaintextChar)
+        character_ASCII = ord(plaintextChar)
 
         # Gets new position of encrypted character in ASCII
-        shiftedValue = (((characterASCII - 32) + shift) % 95) + 32
+        shiftedValue = (((character_ASCII - 32) + (passKeyString_ASCII - 32)) % 95) + 32
 
         # Gets the character at this new position
         newChar = chr(shiftedValue)
 
+        # We only need to save the first shifted value and new character
+        if x == 0:
+            guide_data['sv'] = shiftedValue
+            guide_data['nc'] = newChar
+
         # Concatenates each encrypted character onto the plaintext string
         cipherText += newChar
+
+    guide_data['f_txt'] = cipherText
 
     return cipherText
 
@@ -93,37 +94,112 @@ def encryptMessage(plaintext, passKey):
 def decryptMessage(ciphertext, passKey):
     """Decrypts a ciphertext with the passkey"""
 
+    guide_data['fc'] = 'Decryption'
+    guide_data['txt'] = ciphertext
+    guide_data['key'] = passKey
+
     plainText = ""
     passKeyString = getPassKeyString(text=ciphertext, passKey=passKey)
 
     # Iterates through the pass-key-string and the ciphertext simultaneously
-    for keyChar, plaintextChar in list(zip(passKeyString, ciphertext)):
+    for x, (keyChar, ciphertextChar) in enumerate(list(zip(passKeyString, ciphertext))):
         # Finds the ASCII position for each character in the pass key string
-        shift = getPositionInAscii(keyChar)
+        passKeyString_ASCII = ord(keyChar)
 
         # Gets ASCII value of each ciphertext character.
-        characterASCII = ord(plaintextChar)
+        character_ASCII = ord(ciphertextChar)
 
         # Gets position of decrypted character in ASCII
-        shiftedValue = (((characterASCII - 32) - shift) % 95) + 32
+        shiftedValue = (((character_ASCII - 32) - (passKeyString_ASCII - 32)) % 95) + 32
 
         # Gets the character at this position
         newChar = chr(shiftedValue)
 
+        # We only need to save the first shifted value and new character
+        if x == 0:
+            guide_data['sv'] = shiftedValue
+            guide_data['nc'] = newChar
+
         # Concatenates each decrypted character onto the ciphertext string
         plainText += newChar
+
+    guide_data['f_txt'] = plainText
 
     return plainText
 
 
-def encryptFile(filename, passKey):
+def encryptFile(filename, filepath, passKey):
     """Encrypts the contents of a text file"""
-    pass
+    full_filename = filepath + "/" + filename
+
+    # Generates lines from the file
+    def getLines():
+        with open(full_filename) as f:
+            for line in f:
+                if line != "\n":
+                    yield line.split("\n")[0]
+                else:
+                    yield "\n"
+
+    # Generates encrypted data
+    def getEncryptedData():
+        # Gets file lines from generator
+        for L in getLines():
+            if L != "\n":
+                E = encryptMessage(plaintext=L, passKey=passKey)
+            else:
+                E = "\n"
+
+            yield E
+
+    newFilename = "{}/{}_{}ENC.txt".format(filepath, filename[:-4], 'vigenere')
+
+    # Writes each line of encrypted data
+    with open(newFilename, 'w') as f2:
+        for e in getEncryptedData():
+            if e != "\n":
+                f2.write(e + "\n")
+            else:
+                f2.write("\n")
+
+    return newFilename
 
 
-def decryptFile(filename, passKey):
+def decryptFile(filename, filepath, passKey):
     """Decrypts the contents of a text file"""
-    pass
+    full_filename = filepath + "/" + filename
+
+    # Generates lines from the file
+    def getLines():
+        with open(full_filename) as f:
+            for line in f:
+                if line != "\n":
+                    yield line.split("\n")[0]
+                else:
+                    yield "\n"
+
+    # Generates decrypted data
+    def getDecryptedData():
+        # Gets file lines from generator
+        for L in getLines():
+            if L != "\n":
+                D = decryptMessage(ciphertext=L, passKey=passKey)
+            else:
+                D = "\n"
+
+            yield D
+
+    newFilename = "{}/{}".format(filepath, filename.replace("ENC", "DEC"))
+
+    # Writes each line of encrypted data
+    with open(newFilename, 'w') as f2:
+        for d in getDecryptedData():
+            if d != "\n":
+                f2.write(d + "\n")
+            else:
+                f2.write("\n")
+
+    return newFilename
 
 
 def encryptCheck(passKey, dataformat, plaintext=None, filename=None, filepath=None):
@@ -132,7 +208,7 @@ def encryptCheck(passKey, dataformat, plaintext=None, filename=None, filepath=No
     if dataformat == "Messages":
         encryptedData = encryptMessage(plaintext=plaintext, passKey=passKey)
     elif dataformat == "Files":
-        encryptedData = encryptFile(filename=filename, passKey=passKey)
+        encryptedData = encryptFile(filename=filename, filepath=filepath, passKey=passKey)
     elif dataformat == "Images":
         shifts = getShiftValuesFromPassKey(passKey=passKey)
         encryptedData = imageCrypt.encrypt(filename=filename, filepath=filepath, shifts=shifts, cipherUsed="vigenere")
@@ -146,7 +222,7 @@ def decryptCheck(passKey, dataformat, ciphertext=None, filename=None, filepath=N
     if dataformat == "Messages":
         decryptedData = decryptMessage(ciphertext=ciphertext, passKey=passKey)
     elif dataformat == "Files":
-        decryptedData = decryptFile(filename=filename, passKey=passKey)
+        decryptedData = decryptFile(filename=filename, filepath=filepath, passKey=passKey)
     elif dataformat == "Images":
         shifts = getShiftValuesFromPassKey(passKey=passKey)
         decryptedData = imageCrypt.decrypt(filename=filename, filepath=filepath, shifts=shifts, cipherUsed="vigenere")
@@ -155,8 +231,8 @@ def decryptCheck(passKey, dataformat, ciphertext=None, filename=None, filepath=N
 
 
 def encrypt(passKey, dataformat, plaintext=None, filename=None, filepath=None):
-    return encryptCheck(passKey, dataformat, plaintext=plaintext, filename=filename, filepath=filepath)
+    return guide_data, encryptCheck(passKey, dataformat, plaintext=plaintext, filename=filename, filepath=filepath)
 
 
 def decrypt(passKey, dataformat, ciphertext=None, filename=None, filepath=None):
-    return decryptCheck(passKey, dataformat, ciphertext=ciphertext, filename=filename, filepath=filepath)
+    return guide_data, decryptCheck(passKey, dataformat, ciphertext=ciphertext, filename=filename, filepath=filepath)
