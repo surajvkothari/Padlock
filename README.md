@@ -44,7 +44,12 @@ pip install Pillow
 
 ## Acknowledgments
 
-* StackOverflow community
-* Cryptii - *https://cryptii.com/*
 * A-level Computer Science Teacher - *Mr. Abbas* - *Woodhouse College*
+* The Code Book (Simon Singh)
+* StackOverflow community - *https://stackoverflow.com/*
+* Cryptii - *https://cryptii.com/*
+* Tkinter reference - *https://effbot.org/tkinterbook/*
+* DES Walkthrough - *http://page.math.tu-berlin.de/~kant/teaching/hess/krypto-ws2006/des.htm*
+
+
 
