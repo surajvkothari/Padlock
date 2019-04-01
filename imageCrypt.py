@@ -1,11 +1,21 @@
 # Image encryption module
 
+"""
+Padlock Encryption Software
+Copyright 2019
+
+Created by: Suraj Kothari
+For A-level Computer Science
+at Woodhouse College.
+"""
+
 from PIL import Image
 import itertools
 
 
 def getEncryptedPixel(input_pixel, shift):
     """Encrypts the individual pixels with a shift value"""
+
     # Gets the number of pixel values. JPGs have 3 and PNGs have 4.
     numberOfPixelValues = len(input_pixel)
 
@@ -15,6 +25,15 @@ def getEncryptedPixel(input_pixel, shift):
     R = pixel[0]
     G = pixel[1]
     B = pixel[2]
+
+    """
+    Checks strength of shift value
+    A small shift is considered insignificant, so values below 20 are to be
+    incremented by 50.
+    """
+
+    if (shift % 256) < 20:
+        shift += 50
 
     # Shifts each colour of the pixel by the shift value to get the new pixel values
     colourRed = (R + shift) % 256
@@ -34,6 +53,7 @@ def getEncryptedPixel(input_pixel, shift):
 
 def getDecryptedPixel(input_pixel, shift):
     """Encrypts the individual pixels with a shift value"""
+
     # Gets the number of pixel values. JPGs have 3 and PNGs have 4.
     numberOfPixelValues = len(input_pixel)
 
@@ -44,6 +64,15 @@ def getDecryptedPixel(input_pixel, shift):
     G = pixel[1]
     B = pixel[2]
 
+    """
+    Checks strength of shift value
+    A small shift is considered insignificant, so values below 20 are to be
+    incremented by 50.
+    """
+
+    if (shift % 256) < 20:
+        shift += 50
+
     # Shifts each colour of the pixel by the shift to get the new pixel values
     colourRed = (R - shift) % 256
     colourGreen = (G - shift) % 256
@@ -53,6 +82,7 @@ def getDecryptedPixel(input_pixel, shift):
     Checks if the number of pixel values is 4, as that means the original
     image was a PNG and we need to decrypt its alpha channel as well.
     """
+
     if numberOfPixelValues == 4:
         # PNG images have an alpha channel
         A = pixel[3]
@@ -70,9 +100,11 @@ def getPixelData(width, height, shifts):
     Iterate through the pixel values of the width and height combined from itertools.product()
     then iterate through the shifts in a cycle using itertools.cycle()
     """
+
     for pixelValue, key in zip(itertools.product(width, height), itertools.cycle(shifts)):
         # Returns a tuple: (width, height, key)
         yield (*pixelValue, key)
+
 
 def encryptPixels(width, height, shifts, originalImagePixelData, copyImagePixelData, isTripleDES=None):
     # In Triple DES, the shifts come in a pair
@@ -131,6 +163,7 @@ def decryptPixels(width, height, shifts, encryptedImagePixelData, copyImagePixel
         # Stores the changes onto the copied image’s pixel map
         copyImagePixelData[pixelX, pixelY] = D_pixel
 
+
 def loadEncryption(filename, filepath, originalImage, imageFormat, shifts, cipherUsed):
     """Gets the image pixel data, manipulates the image, then saves it"""
 
@@ -139,6 +172,7 @@ def loadEncryption(filename, filepath, originalImage, imageFormat, shifts, ciphe
     The pixel access object will behave like a 2D array
     which will allow the program to read and modify individual pixels.
     """
+
     originalImagePixelData = originalImage.load()
 
     # Makes a copy of the input image and loads the copied image's pixel map
@@ -151,9 +185,11 @@ def loadEncryption(filename, filepath, originalImage, imageFormat, shifts, ciphe
 
     # Encrypts the image pixels
     if cipherUsed == "TripleDES":
-        encryptPixels(width=width, height=height, shifts=shifts, originalImagePixelData=originalImagePixelData, copyImagePixelData=copyImagePixelData, isTripleDES=True)
+        encryptPixels(width=width, height=height, shifts=shifts, originalImagePixelData=originalImagePixelData,
+            copyImagePixelData=copyImagePixelData, isTripleDES=True)
     else:
-        encryptPixels(width=width, height=height, shifts=shifts, originalImagePixelData=originalImagePixelData, copyImagePixelData=copyImagePixelData)
+        encryptPixels(width=width, height=height, shifts=shifts, originalImagePixelData=originalImagePixelData,
+            copyImagePixelData=copyImagePixelData)
 
     # Closes the original image
     originalImage.close()
@@ -167,6 +203,7 @@ def loadEncryption(filename, filepath, originalImage, imageFormat, shifts, ciphe
     lossy compression. This alters the encrypted pixels and is
     not beneficial when decrypting.
     """
+
     newFilename = "{}/{}_{}ENC.png".format(filepath, filename[:-4], cipherUsed)
 
     # Saves the encrypted image and then close it
@@ -191,6 +228,7 @@ def loadDecryption(filename, filepath, shifts, cipherUsed):
     The pixel access object will behave like a 2D array
     which will allow the program to read and modify individual pixels.
     """
+
     encryptedImagePixelData = inputImage.load()
 
     # Makes a copy of the input image and loads the copied image's pixel map
@@ -203,9 +241,11 @@ def loadDecryption(filename, filepath, shifts, cipherUsed):
 
     # Decrypts the image pixels
     if cipherUsed == "TripleDES":
-        decryptPixels(width=width, height=height, shifts=shifts, encryptedImagePixelData=encryptedImagePixelData, copyImagePixelData=copyPixelMap, isTripleDES=True)
+        decryptPixels(width=width, height=height, shifts=shifts, encryptedImagePixelData=encryptedImagePixelData,
+            copyImagePixelData=copyPixelMap, isTripleDES=True)
     else:
-        decryptPixels(width=width, height=height, shifts=shifts, encryptedImagePixelData=encryptedImagePixelData, copyImagePixelData=copyPixelMap)
+        decryptPixels(width=width, height=height, shifts=shifts, encryptedImagePixelData=encryptedImagePixelData,
+            copyImagePixelData=copyPixelMap)
 
     # Closes the input image
     inputImage.close()
@@ -233,7 +273,8 @@ def encryptionImageHandler(filename, filepath, shifts, cipherUsed):
         # PNG images need to be converted to RGBA format
         originalImage = originalImage.convert("RGBA")
 
-    encryptedData = loadEncryption(filename=filename, filepath=filepath, originalImage=originalImage, imageFormat=extension, shifts=shifts, cipherUsed=cipherUsed)
+    encryptedData = loadEncryption(filename=filename, filepath=filepath, originalImage=originalImage,
+        imageFormat=extension, shifts=shifts, cipherUsed=cipherUsed)
 
     return encryptedData
 
