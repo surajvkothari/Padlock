@@ -1,5 +1,13 @@
-# Contains the styles for the widgets in the main application
+# Stylesheet
 
+"""
+Padlock Encryption Software
+Copyright 2019
+
+Created by: Suraj Kothari
+For A-level Computer Science
+at Woodhouse College.
+"""
 
 class Colours:
     """Set of colours to use in the application"""
@@ -38,7 +46,7 @@ class Fonts:
 
 class ButtonStyle:
     """Styles used for the buttons in the application"""
-    ENCRYPT = {
+    ENCRYPT_BUTTON = {
         "bg": "#2ECC71",
         "activebackground": "#48E68B",
         "fg": "#FFF",
@@ -51,7 +59,7 @@ class ButtonStyle:
         "cursor": "hand2"
     }
 
-    ENCRYPT2 = {
+    ENCRYPT2_BUTTON = {
         "bg": "#2ECC71",
         "activebackground": "#48E68B",
         "fg": "#FFF",
@@ -64,7 +72,7 @@ class ButtonStyle:
         "cursor": "hand2"
     }
 
-    DECRYPT = {
+    DECRYPT_BUTTON = {
         "bg": "#E74C3C",
         "activebackground": "#FF6656",
         "fg": "#FFF",
@@ -77,7 +85,7 @@ class ButtonStyle:
         "cursor": "hand2"
     }
 
-    DECRYPT2 = {
+    DECRYPT2_BUTTON = {
         "bg": "#E74C3C",
         "activebackground": "#FF6656",
         "fg": "#FFF",
@@ -129,6 +137,45 @@ class ButtonStyle:
         "cursor": "hand2"
     }
 
+    CLASSIC_BUTTON = {
+        "bg": "#F0D347",
+        "activebackground": "#FCDD49",
+        "fg": "#FFF",
+        "activeforeground": "#FFF",
+        "pady": 5,
+        "padx": 10,
+        "width": 10,
+        "relief": "flat",
+        "font": ("Arial", 16),
+        "cursor": "hand2"
+    }
+
+    ASCII_BUTTON = {
+        "bg": "#034C9D",
+        "activebackground": "#0559B7",
+        "fg": "#FFF",
+        "activeforeground": "#FFF",
+        "pady": 5,
+        "padx": 10,
+        "width": 10,
+        "relief": "flat",
+        "font": ("Arial", 16),
+        "cursor": "hand2"
+    }
+
+    BASE64_BUTTON = {
+        "bg": "#5FA926",
+        "activebackground": "#439A00",
+        "fg": "#FFF",
+        "activeforeground": "#FFF",
+        "pady": 5,
+        "padx": 10,
+        "width": 10,
+        "relief": "flat",
+        "font": ("Arial", 16),
+        "cursor": "hand2"
+    }
+
     CAESAR_BUTTON = {
         "bg": "#F0D347",
         "activebackground": "#FCDD49",
@@ -143,8 +190,8 @@ class ButtonStyle:
     }
 
     VIGENERE_BUTTON = {
-        "bg": "#08C08C",
-        "activebackground": "#08DDA1",
+        "bg": "#F0D347",
+        "activebackground": "#FCDD49",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -156,8 +203,8 @@ class ButtonStyle:
     }
 
     DES_BUTTON = {
-        "bg": "#17A02C",
-        "activebackground": "#1ABC33",
+        "bg": "#FF5722",
+        "activebackground": "#FF7347",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -169,8 +216,8 @@ class ButtonStyle:
     }
 
     TRIPLE_DES_BUTTON = {
-        "bg": "#466AAD",
-        "activebackground": "#5981CC",
+        "bg": "#FF5722",
+        "activebackground": "#FF7347",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
