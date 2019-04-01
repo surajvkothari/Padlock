@@ -1,8 +1,10 @@
 # Padlock Encryption Software
 
-Padlock is a 3 in 1 encryption software that aims to teach students cryptography through a wonderful designed GUI that gives access to a number of standart encryption methods.
+Padlock is a 3 in 1 encryption software that aims to teach students cryptography through a wonderful designed GUI that gives access to a number of standard encryption methods.
 
-It teaches students ciphers with different levels of security, from Caesar Cipher to DES Cipher. Not only does the software allow the students to encrypt and decrypt their messages, it also allows them to visualise the strength of the ciphers through image encryption and decryption! The software also has support for file encyption/decryption as well.
+It teaches students ciphers with three different levels of security, from Caesar Cipher to DES Cipher. Not only does the software allow the students to encrypt and decrypt their messages, it also allows them to visualise the strength of the ciphers through image encryption and decryption! The software also has support for file encyption/decryption as well.
+
+Moreover, there is a helpful online guide that changes its content dynamically to explain the background process of each cipher using the user's chosen text and key.
 
 ## Getting Started
 
