@@ -10,15 +10,16 @@ at Woodhouse College.
 """
 
 import imageCrypt
+import base64
 import itertools
 import os
-import base64
+import time
 
 guide_data = {}
 
 
-def getShiftValuesForImages(passKey):
-    """Returns a list of ASCII values for each character in the passkey for image encryption and decryption"""
+def getShiftValuesForImage(passKey):
+    """ Returns a list of ASCII values for each character in the passkey for image encryption and decryption """
 
     return [ord(char) for char in passKey]
 
@@ -51,15 +52,19 @@ def getPassKeyString_classic(text, passKey):
             if i == 1:
                 guide_data['pks_demo_t1'] = t
                 guide_data['pks_demo_k1'] = nextKey
+
             elif i == 2:
                 guide_data['pks_demo_t2'] = t
                 guide_data['pks_demo_k2'] = nextKey
+
             elif i == 3:
                 guide_data['pks_demo_t3'] = t
                 guide_data['pks_demo_k3'] = nextKey
+
             elif i == 4:
                 guide_data['pks_demo_t4'] = t
                 guide_data['pks_demo_k4'] = nextKey
+
             elif i == 5:
                 guide_data['pks_demo_t5'] = t
                 guide_data['pks_demo_k5'] = nextKey
@@ -70,15 +75,19 @@ def getPassKeyString_classic(text, passKey):
             if i == 1:
                 guide_data['pks_demo_t1'] = t
                 guide_data['pks_demo_k1'] = t
+
             elif i == 2:
                 guide_data['pks_demo_t2'] = t
                 guide_data['pks_demo_k2'] = t
+
             elif i == 3:
                 guide_data['pks_demo_t3'] = t
                 guide_data['pks_demo_k3'] = t
+
             elif i == 4:
                 guide_data['pks_demo_t4'] = t
                 guide_data['pks_demo_k4'] = t
+
             elif i == 5:
                 guide_data['pks_demo_t5'] = t
                 guide_data['pks_demo_k5'] = t
@@ -122,6 +131,7 @@ def getPassKeyString_ASCII(text, passKey):
     Repeats the original passkey the correct number of times
     and then concatenates both parts to form the pass-key-string.
     """
+
     passKeyString = (passKey * repeatedNum) + extraChars
 
     guide_data['pks_n'] = repeatedNum
@@ -132,7 +142,7 @@ def getPassKeyString_ASCII(text, passKey):
 
 
 def encryptMessage_CLASSIC(plaintext, passKey):
-    """Encrypts a plaintext with the passkey in CLASSIC mode"""
+    """ Encrypts a plaintext with the passkey in CLASSIC mode """
 
     guide_data['fc'] = 'Encryption'
     guide_data['txt'] = plaintext
@@ -198,7 +208,7 @@ def encryptMessage_CLASSIC(plaintext, passKey):
 
 
 def encryptMessage_ASCII(plaintext, passKey):
-    """Encrypts a plaintext with the passkey in ASCII mode"""
+    """ Encrypts a plaintext with the passkey in ASCII mode """
 
     guide_data['fc'] = 'Encryption'
     guide_data['txt'] = plaintext
@@ -235,7 +245,7 @@ def encryptMessage_ASCII(plaintext, passKey):
 
 
 def decryptMessage_CLASSIC(ciphertext, passKey):
-    """Decrypts a ciphertext with the passkey in CLASSIC mode"""
+    """ Decrypts a ciphertext with the passkey in CLASSIC mode """
 
     guide_data['fc'] = 'Decryption'
     guide_data['txt'] = ciphertext
@@ -301,7 +311,7 @@ def decryptMessage_CLASSIC(ciphertext, passKey):
 
 
 def decryptMessage_ASCII(ciphertext, passKey):
-    """Decrypts a ciphertext with the passkey in ASCII mode"""
+    """ Decrypts a ciphertext with the passkey in ASCII mode """
 
     guide_data['fc'] = 'Decryption'
     guide_data['txt'] = ciphertext
@@ -338,7 +348,8 @@ def decryptMessage_ASCII(ciphertext, passKey):
 
 
 def encryptFile(filename, filepath, passKey, cipherMode):
-    """Encrypts the contents of a text file"""
+    """ Encrypts the contents of a text file using base64 """
+
     full_filename = filepath + "/" + filename
 
     # Generates lines from the file
@@ -365,7 +376,7 @@ def encryptFile(filename, filepath, passKey, cipherMode):
 
             yield E
 
-    newFilename = "{}/{}_{}ENC.txt".format(filepath, filename[:-4], 'vigenere')
+    newFilename = "{}/{}_{}_ENC.txt".format(filepath, filename[:-4], 'vigenere')
 
     # Writes each line of encrypted data
     with open(newFilename, 'w') as f2:
@@ -379,25 +390,27 @@ def encryptFile(filename, filepath, passKey, cipherMode):
 
 
 def encryptFileBase64(filename, filepath, passKey):
-    """Encrypts the contents of any file"""
+    """ Encrypts the contents of any file """
     full_filename = filepath + "/" + filename
 
     with open(full_filename, "rb") as f:
         test = f.read()
+
         """
         Converts the binary file contents to base64
         and then formats it into ASCII form.
         """
+
         encoded = base64.b64encode(test).decode("ascii")
 
     Encrypted = encryptMessage_ASCII(plaintext=encoded, passKey=passKey)
 
     extension = os.path.splitext(filename)[1]
     eLength = len(extension)
-    newFilename = "{}/{}_{}ENC{}".format(filepath, filename[:-1*(eLength+1)], 'vigenere', extension)
+    newFilename = "{}/{}_{}_Base64_ENC{}".format(filepath, filename[:-eLength], 'vigenere', extension)
 
     # Converts the ASCII encryption into bytes form to write to new file
-    Encrypted = bytes(Encrypted,'utf-8')
+    Encrypted = bytes(Encrypted, 'utf-8')
 
     # Writes encrypted data to new file
     with open(newFilename, 'wb') as f2:
@@ -407,7 +420,8 @@ def encryptFileBase64(filename, filepath, passKey):
 
 
 def decryptFile(filename, filepath, passKey, cipherMode):
-    """Decrypts the contents of a text file"""
+    """ Decrypts the contents of a text file """
+
     full_filename = filepath + "/" + filename
 
     # Generates lines from the file
@@ -433,7 +447,10 @@ def decryptFile(filename, filepath, passKey, cipherMode):
 
             yield D
 
-    newFilename = "{}/{}".format(filepath, filename.replace("ENC", "DEC"))
+    if "ENC" in filename:
+        newFilename = "{}/{}".format(filepath, filename.replace("ENC", "DEC"))
+    else:
+        newFilename = "{}/{}_{}_DEC.txt".format(filepath, filename[:-4], 'vigenere')
 
     # Writes each line of encrypted data
     with open(newFilename, 'w') as f2:
@@ -447,7 +464,8 @@ def decryptFile(filename, filepath, passKey, cipherMode):
 
 
 def decryptFileBase64(filename, filepath, passKey):
-    """Decrypts the contents of any file"""
+    """ Decrypts the contents of any file using base64 """
+
     full_filename = filepath + "/" + filename
 
     with open(full_filename, "rb") as f:
@@ -456,10 +474,15 @@ def decryptFileBase64(filename, filepath, passKey):
 
     Decrypted = decryptMessage_ASCII(ciphertext=content, passKey=passKey)
 
-    newFilename = "{}/{}".format(filepath, filename.replace("ENC", "DEC"))
+    if "ENC" in filename:
+        newFilename = "{}/{}".format(filepath, filename.replace("ENC", "DEC"))
+    else:
+        extension = os.path.splitext(filename)[1]
+        eLength = len(extension)
+        newFilename = "{}/{}_{}_Base64_DEC{}".format(filepath, filename[:-eLength], 'vigenere', extension)
 
     # Converts the ASCII into bytes and then decodes it from base64 to original
-    decryptedContent = base64.b64decode(bytes(Decrypted,'utf-8'))
+    decryptedContent = base64.b64decode(bytes(Decrypted, 'utf-8'))
 
     # Creates decrypted file
     with open(newFilename, 'wb') as f2:
@@ -469,7 +492,7 @@ def decryptFileBase64(filename, filepath, passKey):
 
 
 def encryptCheck(passKey, dataformat, cipherMode, plaintext=None, filename=None, filepath=None):
-    """Organises how the different dataformats are encrypted"""
+    """ Organises how the different dataformats are encrypted """
 
     if dataformat == "Messages":
         if cipherMode == "ASCII":
@@ -477,21 +500,39 @@ def encryptCheck(passKey, dataformat, cipherMode, plaintext=None, filename=None,
         else:
             encryptedData = encryptMessage_CLASSIC(plaintext=plaintext, passKey=passKey)
 
+        timeTaken = 0
+
     elif dataformat == "Files":
         if cipherMode == "Base64":
+            start = time.time()
+
             encryptedData = encryptFileBase64(filename=filename, filepath=filepath, passKey=passKey)
+
+            end = time.time()
+            timeTaken = end - start
+
         else:
+            start = time.time()
+
             encryptedData = encryptFile(filename=filename, filepath=filepath, passKey=passKey, cipherMode=cipherMode)
 
+            end = time.time()
+            timeTaken = end - start
+
     elif dataformat == "Images":
-        shifts = getShiftValuesForImages(passKey=passKey)
+        start = time.time()
+
+        shifts = getShiftValuesForImage(passKey=passKey)
         encryptedData = imageCrypt.encrypt(filename=filename, filepath=filepath, shifts=shifts, cipherUsed="vigenere")
 
-    return encryptedData
+        end = time.time()
+        timeTaken = end - start
+
+    return encryptedData, timeTaken
 
 
 def decryptCheck(passKey, dataformat, cipherMode, ciphertext=None, filename=None, filepath=None):
-    """Organises how the different dataformats are decrypted"""
+    """ Organises how the different dataformats are decrypted """
 
     if dataformat == "Messages":
         if cipherMode == "ASCII":
@@ -499,17 +540,34 @@ def decryptCheck(passKey, dataformat, cipherMode, ciphertext=None, filename=None
         else:
             decryptedData = decryptMessage_CLASSIC(ciphertext=ciphertext, passKey=passKey)
 
+        timeTaken = 0
+
     elif dataformat == "Files":
         if cipherMode == "Base64":
+            start = time.time()
+
             decryptedData = decryptFileBase64(filename=filename, filepath=filepath, passKey=passKey)
+
+            end = time.time()
+            timeTaken = end - start
         else:
+            start = time.time()
+
             decryptedData = decryptFile(filename=filename, filepath=filepath, passKey=passKey, cipherMode=cipherMode)
 
-    elif dataformat == "Images":
-        shifts = getShiftValuesForImages(passKey=passKey)
-        decryptedData = imageCrypt.decrypt(filename=filename, filepath=filepath, shifts=shifts, cipherUsed="vigenere")
+            end = time.time()
+            timeTaken = end - start
 
-    return decryptedData
+    elif dataformat == "Images":
+        start = time.time()
+
+        shift = getShiftValuesForImage(passKey=passKey)
+        decryptedData = imageCrypt.decrypt(filename=filename, filepath=filepath, shifts=shift, cipherUsed="vigenere")
+
+        end = time.time()
+        timeTaken = end - start
+
+    return decryptedData, timeTaken
 
 
 def encrypt(passKey, dataformat, cipherMode, plaintext=None, filename=None, filepath=None):

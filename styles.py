@@ -9,31 +9,33 @@ For A-level Computer Science
 at Woodhouse College.
 """
 
+
 class Colours:
-    """Set of colours to use in the application"""
-    MAIN = "#344955"
-    SECONDARY = "#232F34"
-    LOGO = "#F9AA33"
+    """ Set of colours to use in the application """
+
+    MAIN = "#455A64"
+    FOOTER = "#37474F"
+    LOGO = "#F9A825"
     TAGS_NOT_ACTIVE = "#E6E6E6"
     BACKGROUND = "#FFF"
     GREY_BACKGROUND = "#F2F4F6"
     FOREGROUND = "#000"
     GREY_FOREGROUND = "#90999E"
-    TITLE_FG = "#2ECC71"
-    TITLE2_FG = "#E74C3C"
+    TITLE_FG = "#4CAF50"
+    TITLE2_FG = "#F44336"
     SMALL_TITLE = "#90999E"
-    CIPHER_FG = "#F9AA33"
-    ERROR = "#E30425"
+    CIPHER_FG = "#FF5722"
+    ERROR = "#F44336"
     INFO = "#555"
-    STATUS_OK = "#609F74"
-    STATUS_ERROR = "#E30425"
-    STATUS_WAIT = "#F9AA33"
-    GUIDE_LINK = "#3D9ADB"
+    STATUS_OK = "#4CAF50"
+    STATUS_WAIT = "#FF5722"
+    GUIDE_LINK = "#00BCD4"
 
 
 class Fonts:
-    """Set of fonts to use in the application"""
-    LOGO = ('Broadway', '18')
+    """ Set of fonts to use in the application """
+
+    LOGO = ('Century Gothic Bold', '18')
     SMALL_PRINT = ('Arial', '8')
     TAGS = ('Calibri', '14')
     TITLE = ('Arial Bold', '14')
@@ -45,10 +47,11 @@ class Fonts:
 
 
 class ButtonStyle:
-    """Styles used for the buttons in the application"""
+    """ Styles used for the buttons in the application """
+
     ENCRYPT_BUTTON = {
-        "bg": "#2ECC71",
-        "activebackground": "#48E68B",
+        "bg": "#4CAF50",
+        "activebackground": "#58CE5D",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -59,9 +62,10 @@ class ButtonStyle:
         "cursor": "hand2"
     }
 
+    # Used in the encryption menu
     ENCRYPT2_BUTTON = {
-        "bg": "#2ECC71",
-        "activebackground": "#48E68B",
+        "bg": "#4CAF50",
+        "activebackground": "#58CE5D",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -73,8 +77,8 @@ class ButtonStyle:
     }
 
     DECRYPT_BUTTON = {
-        "bg": "#E74C3C",
-        "activebackground": "#FF6656",
+        "bg": "#F44336",
+        "activebackground": "#F96854",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -85,9 +89,10 @@ class ButtonStyle:
         "cursor": "hand2"
     }
 
+    # Used in the decryption menu
     DECRYPT2_BUTTON = {
-        "bg": "#E74C3C",
-        "activebackground": "#FF6656",
+        "bg": "#F44336",
+        "activebackground": "#F96854",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -99,8 +104,8 @@ class ButtonStyle:
     }
 
     MESSAGE_BUTTON = {
-        "bg": "#4CB050",
-        "activebackground": "#66BB6A",
+        "bg": "#4CAF50",
+        "activebackground": "#58CE5D",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -112,8 +117,8 @@ class ButtonStyle:
     }
 
     FILE_BUTTON = {
-        "bg": "#E67E22",
-        "activebackground": "#E09655",
+        "bg": "#FF5722",
+        "activebackground": "#fc683a",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -125,8 +130,8 @@ class ButtonStyle:
     }
 
     IMAGE_BUTTON = {
-        "bg": "#E74C3C",
-        "activebackground": "#FF6656",
+        "bg": "#F44336",
+        "activebackground": "#F96854",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -138,8 +143,8 @@ class ButtonStyle:
     }
 
     CLASSIC_BUTTON = {
-        "bg": "#F0D347",
-        "activebackground": "#FCDD49",
+        "bg": "#FFC107",
+        "activebackground": "#ffd044",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -164,8 +169,8 @@ class ButtonStyle:
     }
 
     BASE64_BUTTON = {
-        "bg": "#5FA926",
-        "activebackground": "#439A00",
+        "bg": "#8BC34A",
+        "activebackground": "#9AD852",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -228,9 +233,22 @@ class ButtonStyle:
         "cursor": "hand2"
     }
 
+    AES_BUTTON = {
+        "bg": "#F44336",
+        "activebackground": "#f96854",
+        "fg": "#FFF",
+        "activeforeground": "#FFF",
+        "pady": 5,
+        "padx": 10,
+        "width": 10,
+        "relief": "flat",
+        "font": ("Arial", 16),
+        "cursor": "hand2",
+    }
+
     COPY_BUTTON = {
-        "bg": "#3f9ADB",
-        "activebackground": "#5981CC",
+        "bg": "#2196F3",
+        "activebackground": "#3DA5f7",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 1,
@@ -242,8 +260,8 @@ class ButtonStyle:
     }
 
     UPLOAD_BUTTON = {
-        "bg": "#3f9ADB",
-        "activebackground": "#5981CC",
+        "bg": "#2196F3",
+        "activebackground": "#3DA5f7",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 1,
