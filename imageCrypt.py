@@ -11,9 +11,14 @@ at Woodhouse College.
 
 from PIL import Image
 import itertools
+import time
 
 
-def getEncryptedPixel(input_pixel, shift):
+def getBinary(denary):
+    return bin(denary)[2:][:4]
+
+
+def getEncryptedPixel(input_pixel, shift, cipherUsed):
     """Encrypts the individual pixels with a shift value"""
 
     # Gets the number of pixel values. JPGs have 3 and PNGs have 4.
@@ -27,13 +32,13 @@ def getEncryptedPixel(input_pixel, shift):
     B = pixel[2]
 
     """
-    Checks strength of shift value
-    A small shift is considered insignificant, so values below 20 are to be
-    incremented by 50.
+    For Medium and Strong ciphers, if the shift is too small, it is increase
+    to avoid small shifts in colours
     """
 
-    if (shift % 256) < 20:
-        shift += 50
+    if cipherUsed in ("DES", "TripleDES", "AES"):
+        if (shift % 256) < 20 or (256 - (shift % 256)) < 20:
+            shift += 50
 
     # Shifts each colour of the pixel by the shift value to get the new pixel values
     colourRed = (R + shift) % 256
@@ -51,7 +56,7 @@ def getEncryptedPixel(input_pixel, shift):
         return (colourRed, colourGreen, colourBlue)
 
 
-def getDecryptedPixel(input_pixel, shift):
+def getDecryptedPixel(input_pixel, shift, cipherUsed):
     """Encrypts the individual pixels with a shift value"""
 
     # Gets the number of pixel values. JPGs have 3 and PNGs have 4.
@@ -65,13 +70,13 @@ def getDecryptedPixel(input_pixel, shift):
     B = pixel[2]
 
     """
-    Checks strength of shift value
-    A small shift is considered insignificant, so values below 20 are to be
-    incremented by 50.
+    For Medium and Strong ciphers, if the shift is too small, it is increased
+    to avoid small shifts in colours
     """
 
-    if (shift % 256) < 20:
-        shift += 50
+    if cipherUsed in ("DES", "TripleDES", "AES"):
+        if (shift % 256) < 20 or (256 - (shift % 256)) < 20:
+            shift += 50
 
     # Shifts each colour of the pixel by the shift to get the new pixel values
     colourRed = (R - shift) % 256
@@ -93,28 +98,48 @@ def getDecryptedPixel(input_pixel, shift):
         return (colourRed, colourGreen, colourBlue)
 
 
-def getPixelData(width, height, shifts):
-    """Creates a generator function"""
+def getPixelData(width, height, shifts, cipherUsed):
+    """Creates a generator function to get pixel and key tuples"""
 
     """
-    Iterate through the pixel values of the width and height combined from itertools.product()
-    then iterate through the shifts in a cycle using itertools.cycle()
+    In AES, the pixels are extracted vertically.
+    The image is iterated column wise instead of horizontally.
     """
-
-    for pixelValue, key in zip(itertools.product(width, height), itertools.cycle(shifts)):
-        # Returns a tuple: (width, height, key)
-        yield (*pixelValue, key)
+    if cipherUsed == "AES":
 
 
-def encryptPixels(width, height, shifts, originalImagePixelData, copyImagePixelData, isTripleDES=None):
+        """
+        Swaps the inner loops of
+        itertools.product to iterate column-wise.
+        """
+        verticalGenerator = ((x, y) for y in height for x in width)
+
+
+        for pixelValue, key in zip(verticalGenerator, itertools.cycle(shifts)):
+            # Returns a tuple: (pixelX, pixelY, key)
+            yield (*pixelValue, key)
+
+    else:
+        """
+        Iterates through the pixel values of the width and height combined from itertools.product()
+        then iterates through the shifts in a cycle using itertools.cycle()
+        """
+
+        for pixelValue, key in zip(itertools.product(width, height), itertools.cycle(shifts)):
+            # Returns a tuple: (pixelX, pixelY, key)
+            yield (*pixelValue, key)
+
+
+def encryptPixels(width, height, shifts, originalImagePixelData, copyImagePixelData, cipherUsed, isTripleDES=None):
     # In Triple DES, the shifts come in a pair
     if isTripleDES is True:
         shifts_list = shifts[0]
         second_shifts = shifts[1]
+        third_shifts = shifts[2]
     else:
         shifts_list = shifts
 
-    for pixelTuple in getPixelData(width=width, height=height, shifts=shifts_list):
+    for pixelTuple in getPixelData(width=width, height=height, shifts=shifts_list, cipherUsed=cipherUsed):
         # Sets the pixel's X and Y values; and the key value, from the tuple given by the generator function
         pixelX, pixelY, shift = pixelTuple[0], pixelTuple[1], pixelTuple[2]
 
@@ -122,28 +147,33 @@ def encryptPixels(width, height, shifts, originalImagePixelData, copyImagePixelD
         pixel = originalImagePixelData[pixelX, pixelY]
 
         if isTripleDES is True:
-            E_pixel_temp = getEncryptedPixel(input_pixel=pixel, shift=shift)
+            E_pixel_temp = getEncryptedPixel(input_pixel=pixel, shift=shift, cipherUsed=cipherUsed)
 
             shift2 = second_shifts[shifts_list.index(shift)]
-            D_pixel = getDecryptedPixel(input_pixel=E_pixel_temp, shift=shift2)
 
-            E_pixel = getEncryptedPixel(input_pixel=D_pixel, shift=shift)
+            D_pixel = getDecryptedPixel(input_pixel=E_pixel_temp, shift=shift2, cipherUsed=cipherUsed)
+
+            shift3 = third_shifts[shifts_list.index(shift)]
+
+            E_pixel = getEncryptedPixel(input_pixel=D_pixel, shift=shift3, cipherUsed=cipherUsed)
+
         else:
-            E_pixel = getEncryptedPixel(input_pixel=pixel, shift=shift)
+            E_pixel = getEncryptedPixel(input_pixel=pixel, shift=shift, cipherUsed=cipherUsed)
 
         # Stores the changes onto the copied image’s pixel map
         copyImagePixelData[pixelX, pixelY] = E_pixel
 
 
-def decryptPixels(width, height, shifts, encryptedImagePixelData, copyImagePixelData, isTripleDES=None):
+def decryptPixels(width, height, shifts, encryptedImagePixelData, copyImagePixelData, cipherUsed, isTripleDES=None):
     # In Triple DES, the shifts come in a pair
     if isTripleDES is True:
         shifts_list = shifts[0]
         second_shifts = shifts[1]
+        third_shifts = shifts[2]
     else:
         shifts_list = shifts
 
-    for pixelTuple in getPixelData(width=width, height=height, shifts=shifts_list):
+    for pixelTuple in getPixelData(width=width, height=height, shifts=shifts_list, cipherUsed=cipherUsed):
         # Sets the pixel's X and Y values; and the key value, from the tuple given by the generator function
         pixelX, pixelY, shift = pixelTuple[0], pixelTuple[1], pixelTuple[2]
 
@@ -151,14 +181,18 @@ def decryptPixels(width, height, shifts, encryptedImagePixelData, copyImagePixel
         pixel = encryptedImagePixelData[pixelX, pixelY]
 
         if isTripleDES is True:
-            D_pixel_temp = getDecryptedPixel(input_pixel=pixel, shift=shift)
+            shift3 = third_shifts[shifts_list.index(shift)]
+
+            D_pixel_temp = getDecryptedPixel(input_pixel=pixel, shift=shift3, cipherUsed=cipherUsed)
 
             shift2 = second_shifts[shifts_list.index(shift)]
-            E_pixel = getEncryptedPixel(input_pixel=D_pixel_temp, shift=shift2)
 
-            D_pixel = getDecryptedPixel(input_pixel=E_pixel, shift=shift)
+            E_pixel = getEncryptedPixel(input_pixel=D_pixel_temp, shift=shift2, cipherUsed=cipherUsed)
+
+            D_pixel = getDecryptedPixel(input_pixel=E_pixel, shift=shift, cipherUsed=cipherUsed)
+
         else:
-            D_pixel = getDecryptedPixel(input_pixel=pixel, shift=shift)
+            D_pixel = getDecryptedPixel(input_pixel=pixel, shift=shift, cipherUsed=cipherUsed)
 
         # Stores the changes onto the copied image’s pixel map
         copyImagePixelData[pixelX, pixelY] = D_pixel
@@ -169,7 +203,7 @@ def loadEncryption(filename, filepath, originalImage, imageFormat, shifts, ciphe
 
     """
     Gets a pixel access object for the original image
-    The pixel access object will behave like a 2D array
+    The pixel access object will behave like a 2D list
     which will allow the program to read and modify individual pixels.
     """
 
@@ -186,10 +220,10 @@ def loadEncryption(filename, filepath, originalImage, imageFormat, shifts, ciphe
     # Encrypts the image pixels
     if cipherUsed == "TripleDES":
         encryptPixels(width=width, height=height, shifts=shifts, originalImagePixelData=originalImagePixelData,
-            copyImagePixelData=copyImagePixelData, isTripleDES=True)
+            copyImagePixelData=copyImagePixelData, cipherUsed=cipherUsed, isTripleDES=True)
     else:
         encryptPixels(width=width, height=height, shifts=shifts, originalImagePixelData=originalImagePixelData,
-            copyImagePixelData=copyImagePixelData)
+            copyImagePixelData=copyImagePixelData, cipherUsed=cipherUsed)
 
     # Closes the original image
     originalImage.close()
@@ -225,7 +259,7 @@ def loadDecryption(filename, filepath, shifts, cipherUsed):
 
     """
     Gets a pixel access object for the input image
-    The pixel access object will behave like a 2D array
+    The pixel access object will behave like a 2D list
     which will allow the program to read and modify individual pixels.
     """
 
@@ -242,15 +276,18 @@ def loadDecryption(filename, filepath, shifts, cipherUsed):
     # Decrypts the image pixels
     if cipherUsed == "TripleDES":
         decryptPixels(width=width, height=height, shifts=shifts, encryptedImagePixelData=encryptedImagePixelData,
-            copyImagePixelData=copyPixelMap, isTripleDES=True)
+            copyImagePixelData=copyPixelMap, cipherUsed=cipherUsed, isTripleDES=True)
     else:
         decryptPixels(width=width, height=height, shifts=shifts, encryptedImagePixelData=encryptedImagePixelData,
-            copyImagePixelData=copyPixelMap)
+            copyImagePixelData=copyPixelMap, cipherUsed=cipherUsed)
 
     # Closes the input image
     inputImage.close()
 
-    newFilename = "{}/{}".format(filepath, filename.replace("ENC", "DEC"))
+    if "ENC" in filename:
+        newFilename = "{}/{}".format(filepath, filename.replace("ENC", "DEC"))
+    else:
+        newFilename = "{}/{}_{}DEC.png".format(filepath, filename[:-4], cipherUsed)
 
     # Saves the encrypted image
     copyImage.save(newFilename)

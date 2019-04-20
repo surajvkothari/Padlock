@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """
 Padlock Encryption Software
 Copyright 2019
@@ -9,6 +10,7 @@ at Woodhouse College.
 """
 
 import multicrypt
+from PIL import Image, ImageTk
 import tkinter as tk
 import tkinter.ttk
 import tkinter.filedialog
@@ -16,7 +18,7 @@ import os
 import urllib
 import webbrowser
 import time
-from PIL import Image, ImageTk
+import threading
 from styles import *
 
 
@@ -26,6 +28,7 @@ class Padlock(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
 
+        self.iconbitmap("Images/Padlock icon.ico")  # Icon in title bar
         self.title("Padlock Encryption Software")
         self.geometry("1100x600")  # Default application window size
 
@@ -33,6 +36,7 @@ class Padlock(tk.Tk):
         self.minsize(1100, 600)
 
         """Makes the application responsive when resizing"""
+
         top = self.winfo_toplevel()  # Gets the top level window to resize
 
         # Makes the rows and columns of the window responsive by scale factor 1
@@ -43,11 +47,13 @@ class Padlock(tk.Tk):
         self.configure(background="white")
 
         """Creates a footer"""
-        footer = tk.Frame(self, bg=Colours.SECONDARY)
+
+        footer = tk.Frame(self, bg=Colours.FOOTER)
         self.copyrightMessage = "Copyright 2019 - Padlock Encryption Software. \
 Created by: Suraj Kothari. For A-level Computer Science at Woodhouse College."
+
         copyrightText = tk.Label(footer, text=self.copyrightMessage,
-            bg=Colours.SECONDARY, fg="white", font=Fonts.SMALL_PRINT)
+            bg=Colours.FOOTER, fg="white", font=Fonts.SMALL_PRINT)
 
         footer.grid(row=2, sticky="ew")
         copyrightText.grid()
@@ -56,7 +62,7 @@ Created by: Suraj Kothari. For A-level Computer Science at Woodhouse College."
 
         # Sets the current frame to the home page
         self.switch_frame(HomePage)
-        #self.switch_frame(EncryptMenu, process="Encrypt", dataFormat="Files", cipher="Triple DES Cipher", cipherMode="Base64")
+        #self.switch_frame(EncryptMenu, process="Encrypt", dataFormat="Images", cipher="AES Cipher")
 
     def switch_frame(self, frame_class, process=None, dataFormat=None, cipher=None, cipherMode=None):
         """Destroys current frame and replaces it with a new one."""
@@ -271,14 +277,14 @@ class CipherMenu(tk.Frame):
             # If an image format is chosen, the button will go directly to the encrypt/decrypt menu. Mode selection is ignored.
             self.caesar_Button = tk.Button(self, text="Caesar",
                 command=lambda: self.master.switch_frame(EncryptMenu, process=self.process,
-                    dataFormat=self.dataFormat, cipher="Caesar Cipher") \
+                    dataFormat=self.dataFormat, cipher="Caesar Cipher")
                     if self.process == "Encrypt" else \
                     self.master.switch_frame(DecryptMenu, process=self.process,
                         dataFormat=self.dataFormat, cipher="Caesar Cipher"), **ButtonStyle.CAESAR_BUTTON)
 
             self.vigenere_Button = tk.Button(self, text="Vigenere",
                 command=lambda: self.master.switch_frame(EncryptMenu, process=self.process,
-                    dataFormat=self.dataFormat, cipher="Vigenere Cipher") \
+                    dataFormat=self.dataFormat, cipher="Vigenere Cipher")
                         if self.process == "Encrypt" else \
                         self.master.switch_frame(DecryptMenu, process=self.process,
                             dataFormat=self.dataFormat, cipher="Vigenere Cipher"), **ButtonStyle.VIGENERE_BUTTON)
@@ -292,8 +298,6 @@ class CipherMenu(tk.Frame):
                 command=lambda: self.master.switch_frame(CipherModeMenu, process=self.process,
                     dataFormat=self.dataFormat, cipher="Vigenere Cipher"), **ButtonStyle.VIGENERE_BUTTON)
 
-        self.verticalSeparator = tk.ttk.Separator(self, orient="vertical")
-
         if self.dataFormat == "Files":
             self.DES_Button = tk.Button(self, text="DES",
                 command=lambda: self.master.switch_frame(CipherModeMenu, process=self.process,
@@ -302,33 +306,54 @@ class CipherMenu(tk.Frame):
             self.triple_DES_Button = tk.Button(self, text="Triple DES",
                 command=lambda: self.master.switch_frame(CipherModeMenu, process=self.process,
                     dataFormat=self.dataFormat, cipher="Triple DES Cipher"), **ButtonStyle.TRIPLE_DES_BUTTON)
+
+            self.AES_Button = tk.Button(self, text="AES",
+                command=lambda: self.master.switch_frame(CipherModeMenu, process=self.process,
+                    dataFormat=self.dataFormat, cipher="AES Cipher"), **ButtonStyle.AES_BUTTON)
         else:
             self.DES_Button = tk.Button(self, text="DES",
                 command=lambda: self.master.switch_frame(EncryptMenu, process=self.process,
-                    dataFormat=self.dataFormat, cipher="DES Cipher") \
+                    dataFormat=self.dataFormat, cipher="DES Cipher")
                         if self.process == "Encrypt" else \
                             self.master.switch_frame(DecryptMenu, process=self.process,
                                 dataFormat=self.dataFormat, cipher="DES Cipher"), **ButtonStyle.DES_BUTTON)
 
             self.triple_DES_Button = tk.Button(self, text="Triple DES",
                 command=lambda: self.master.switch_frame(EncryptMenu, process=self.process,
-                    dataFormat=self.dataFormat, cipher="Triple DES Cipher") \
+                    dataFormat=self.dataFormat, cipher="Triple DES Cipher")
                         if self.process == "Encrypt" else \
                             self.master.switch_frame(DecryptMenu, process=self.process,
                                 dataFormat=self.dataFormat, cipher="Triple DES Cipher"), **ButtonStyle.TRIPLE_DES_BUTTON)
 
+            self.AES_Button = tk.Button(self, text="AES",
+                command=lambda: self.master.switch_frame(EncryptMenu, process=self.process,
+                    dataFormat=self.dataFormat, cipher="AES Cipher")
+                        if self.process == "Encrypt" else \
+                            self.master.switch_frame(DecryptMenu, process=self.process,
+                                dataFormat=self.dataFormat, cipher="AES Cipher"), **ButtonStyle.AES_BUTTON)
+
+        self.verticalSeparator = tk.ttk.Separator(self, orient="vertical")
+        self.verticalSeparator2 = tk.ttk.Separator(self, orient="vertical")
+
         self.weakText = tk.Label(self, text="WEAK CIPHERS", bg=Colours.BACKGROUND,
             fg=Colours.INFO, font=Fonts.INFO)
+
         self.medText = tk.Label(self, text="MEDIUM CIPHERS", bg=Colours.BACKGROUND,
             fg=Colours.INFO, font=Fonts.INFO)
 
-        self.weakText.grid(row=0, column=0, padx=26, pady=(0,5))
+        self.strongText = tk.Label(self, text="STRONG CIPHERS", bg=Colours.BACKGROUND,
+            fg=Colours.INFO, font=Fonts.INFO)
+
+        self.weakText.grid(row=0, column=0, padx=26, pady=(0, 5))
         self.caesar_Button.grid(row=1, column=0, padx=26, pady=(0, 10))
         self.vigenere_Button.grid(row=2, column=0, padx=26, pady=(10, 0))
         self.verticalSeparator.grid(column=1, row=1, rowspan=2, sticky="ns")
-        self.medText.grid(column=2, row=0, padx=26, pady=(0,5))
+        self.medText.grid(column=2, row=0, padx=26, pady=(0, 5))
         self.DES_Button.grid(column=2, row=1, padx=26, pady=(0, 10))
         self.triple_DES_Button.grid(column=2, row=2, padx=26, pady=(10, 0))
+        self.verticalSeparator2.grid(column=3, row=1, rowspan=2, sticky="ns")
+        self.strongText.grid(column=4, row=0, padx=26, pady=(0, 5))
+        self.AES_Button.grid(column=4, row=1, padx=26, pady=(0, 10))
 
         # Creates hover listeners for the buttons to change colour when hovered
         self.caesar_Button.bind("<Enter>", lambda e: self.caesar_Button.configure(
@@ -347,6 +372,10 @@ class CipherMenu(tk.Frame):
             bg=ButtonStyle.TRIPLE_DES_BUTTON["activebackground"]))
         self.triple_DES_Button.bind("<Leave>", lambda e: self.triple_DES_Button.configure(
             bg=ButtonStyle.TRIPLE_DES_BUTTON["bg"]))
+        self.AES_Button.bind("<Enter>", lambda e: self.AES_Button.configure(
+            bg=ButtonStyle.AES_BUTTON["activebackground"]))
+        self.AES_Button.bind("<Leave>", lambda e: self.AES_Button.configure(
+            bg=ButtonStyle.AES_BUTTON["bg"]))
 
 
 class CipherModeMenu(tk.Frame):
@@ -404,10 +433,10 @@ such as punctuation and numbers. Use for text files."
             dataFormat=self.dataFormat))
 
         # If chosen format is files and either DES or Triple DES is selected, create these widgets
-        if self.dataFormat == "Files" and self.cipher in ("DES Cipher", "Triple DES Cipher"):
+        if self.dataFormat == "Files" and self.cipher in ("DES Cipher", "Triple DES Cipher", "AES Cipher"):
             self.classicButton = tk.Button(self, text="Classic",
             command=lambda: self.master.switch_frame(EncryptMenu, process=self.process, dataFormat=self.dataFormat,
-                cipher=self.cipher, cipherMode="Classic") \
+                cipher=self.cipher, cipherMode="Classic")
                     if self.process == "Encrypt" else \
                         self.master.switch_frame(DecryptMenu, process=self.process,
                             dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="Classic"), **ButtonStyle.CLASSIC_BUTTON)
@@ -418,7 +447,7 @@ such as punctuation and numbers. Use for text files."
 
             self.base64Button = tk.Button(self, text="Base64",
             command=lambda: self.master.switch_frame(EncryptMenu, process=self.process,
-                dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="Base64") \
+                dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="Base64")
                     if self.process == "Encrypt" else \
                         self.master.switch_frame(DecryptMenu, process=self.process,
                             dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="Base64"), **ButtonStyle.BASE64_BUTTON)
@@ -443,7 +472,7 @@ such as punctuation and numbers. Use for text files."
         else:
             self.classicButton = tk.Button(self, text="Classic",
             command=lambda: self.master.switch_frame(EncryptMenu, process=self.process, dataFormat=self.dataFormat,
-                cipher=self.cipher, cipherMode="Classic") \
+                cipher=self.cipher, cipherMode="Classic")
                     if self.process == "Encrypt" else \
                         self.master.switch_frame(DecryptMenu, process=self.process,
                             dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="Classic"), **ButtonStyle.CLASSIC_BUTTON)
@@ -454,7 +483,7 @@ such as punctuation and numbers. Use for text files."
 
             self.asciiButton = tk.Button(self, text="ASCII",
             command=lambda: self.master.switch_frame(EncryptMenu, process=self.process,
-                dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="ASCII") \
+                dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="ASCII")
                     if self.process == "Encrypt" else \
                         self.master.switch_frame(DecryptMenu, process=self.process,
                             dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="ASCII"), **ButtonStyle.ASCII_BUTTON)
@@ -470,7 +499,7 @@ such as punctuation and numbers. Use for text files."
             if self.dataFormat == "Files":
                 self.base64Button = tk.Button(self, text="Base64",
                 command=lambda: self.master.switch_frame(EncryptMenu, process=self.process,
-                    dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="Base64") \
+                    dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="Base64")
                         if self.process == "Encrypt" else \
                             self.master.switch_frame(DecryptMenu, process=self.process,
                                 dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="Base64"), **ButtonStyle.BASE64_BUTTON)
@@ -558,6 +587,8 @@ class EncryptMenu(tk.Frame):
             self.outputBox.delete("1.0", "end")
             self.outputBox.configure(state="disabled", cursor="X_cursor")
             self.error.grid(sticky="w", pady=(5, 0))
+
+            """ Input validation """
 
             if p == "":
                 self.errorMessage.set("The plaintext field is empty.")
@@ -656,8 +687,8 @@ class EncryptMenu(tk.Frame):
         self.sectionTag.grid(column=2, row=0, pady=(10, 0), padx=10)
         self.sectionTag2.grid(column=3, row=0, pady=(10, 0), padx=10)
 
-        # DES cipher has no modes so this won't display the mode tag
-        if self.cipher == "DES Cipher":
+        # DES cipher and AES cipher have no modes so this won't display the mode tag
+        if self.cipher in ("DES Cipher", "AES Cipher"):
             self.sectionTag4.grid(column=5, row=0, sticky="ns", ipadx=40, pady=(10, 0), padx=10)
         else:
             self.sectionTag3.grid(column=4, row=0, pady=(10, 0), padx=10)
@@ -724,6 +755,8 @@ class EncryptMenu(tk.Frame):
             bg=Colours.BACKGROUND, fg=Colours.GUIDE_LINK, cursor="hand2")
         self.guidelink.bind("<Button-1>", lambda e: openguide())
 
+        """Widget placment"""
+
         self.inputFrame.grid(padx=50, sticky="n")
         self.subFrame.grid(sticky="w")
         self.title.grid(padx=16, pady=16)
@@ -754,21 +787,39 @@ class EncryptMenu(tk.Frame):
         self.outputScrollbar.grid(row=0, column=1, sticky='nsew')
         self.subFrameGuide.grid(sticky="w")
 
+        """ Hover effects """
+
+        self.encryptButton.bind("<Enter>", lambda e: self.encryptButton.configure(
+            bg=ButtonStyle.ENCRYPT2_BUTTON["activebackground"]))
+        self.encryptButton.bind("<Leave>", lambda e: self.encryptButton.configure(
+            bg=ButtonStyle.ENCRYPT2_BUTTON["bg"]))
+        self.copyButton.bind("<Enter>", lambda e: self.copyButton.configure(
+            bg=ButtonStyle.COPY_BUTTON["activebackground"]))
+        self.copyButton.bind("<Leave>", lambda e: self.copyButton.configure(
+            bg=ButtonStyle.COPY_BUTTON["bg"]))
+        self.copyButton2.bind("<Enter>", lambda e: self.copyButton2.configure(
+            bg=ButtonStyle.COPY_BUTTON["activebackground"]))
+        self.copyButton2.bind("<Leave>", lambda e: self.copyButton2.configure(
+            bg=ButtonStyle.COPY_BUTTON["bg"]))
+
     def messageSectionForTripleDES(self):
         def updateOutputBox():
             """
             Gets the contents of the input and key boxes, then checks them for
             validation, before retrieving the ciphertext from the
-            multicrypt module. Lastly, the ciphertext is placed in the output box.
+            multicrypt module. The ciphertext is then placed in the output box.
             """
 
             p = self.inputBox.get()
             k = self.keyBox.get()
             k2 = self.keyBox2.get()
+            k3 = self.keyBox3.get()
 
             self.outputBox.delete("1.0", "end")
             self.outputBox.configure(state="disabled", cursor="X_cursor")
             self.error.grid(sticky="w", pady=(5, 0))
+
+            """ Input validation """
 
             if p == "":
                 self.errorMessage.set("The plaintext field is empty.")
@@ -790,10 +841,19 @@ class EncryptMenu(tk.Frame):
                 self.errorMessage.set("The second key must be at least 8 characters long.")
                 return None
 
+            if k3 == "":
+                self.errorMessage.set("The third key field is empty.")
+                return None
+
+            if len(k3) < 8:
+                self.errorMessage.set("The third key must be at least 8 characters long.")
+                return None
+
             self.error.grid_forget()  # Removes the error message
             self.errorMessage.set("")
 
-            self.guide_data, cipherText = multicrypt.encrypt(plaintext=p, passKey=(k, k2), cipher=self.cipher, dataformat=self.dataFormat)
+            self.guide_data, cipherText = multicrypt.encrypt(plaintext=p, passKey=(k, k2, k3),
+                cipher=self.cipher, dataformat=self.dataFormat)
 
             self.outputBox.configure(state="normal", cursor="xterm")
             self.outputBox.insert("1.0", cipherText)
@@ -873,38 +933,51 @@ class EncryptMenu(tk.Frame):
         self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
+
+        # Key section 1
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
 
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        # Key section 2
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox2 = tk.Entry(self.subFrame5, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
-        self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
+        # Key section 3
+        self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.encryptButton = tk.Button(self.subFrame6, text="Encrypt", command=lambda: updateOutputBox(),
+        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
+        self.keyBox3 = tk.Entry(self.subFrame6, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
+            highlightcolor="orange", highlightbackground="grey")
+
+        self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
+        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.encryptButton = tk.Button(self.subFrame7, text="Encrypt", command=lambda: updateOutputBox(),
             **ButtonStyle.ENCRYPT2_BUTTON)
-        self.error = tk.Label(self.subFrame6, textvariable=self.errorMessage, wraplength=200, justify="left",
+        self.error = tk.Label(self.subFrame7, textvariable=self.errorMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Output frame section"""
 
         self.outputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame7 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame7, text="Ciphertext", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
-        self.copyButton2 = tk.Button(self.subFrame7, text="Copy Ciphertext", compound="left", image=self.COPY_ICON,
-        command=lambda: copyOutputToClipboard(), **ButtonStyle.COPY_BUTTON)
-        self.horizontalSeparator5 = tk.ttk.Separator(self.outputFrame, orient="horizontal")
         self.subFrame8 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.outputBox = tk.Text(self.subFrame8, width=25, height=10, bd=0, wrap="word", bg=Colours.BACKGROUND,
+        self.title2 = tk.Label(self.subFrame8, text="Ciphertext", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.copyButton2 = tk.Button(self.subFrame8, text="Copy Ciphertext", compound="left", image=self.COPY_ICON,
+        command=lambda: copyOutputToClipboard(), **ButtonStyle.COPY_BUTTON)
+
+        self.horizontalSeparator6 = tk.ttk.Separator(self.outputFrame, orient="horizontal")
+        self.subFrame9 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
+        self.outputBox = tk.Text(self.subFrame9, width=25, height=10, bd=0, wrap="word", bg=Colours.BACKGROUND,
             fg=Colours.GREY_FOREGROUND, font=Fonts.TEXT, state="disabled", cursor="X_cursor")
-        self.outputScrollbar = tk.Scrollbar(self.subFrame8, command=self.outputBox.yview)
+        self.outputScrollbar = tk.Scrollbar(self.subFrame9, command=self.outputBox.yview)
         self.outputBox['yscrollcommand'] = self.outputScrollbar.set
 
         self.subFrameGuide = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
@@ -912,6 +985,8 @@ class EncryptMenu(tk.Frame):
         self.guidelink = tk.Label(self.outputFrame, text="Want to learn how the process is done? Click here!",
             bg=Colours.BACKGROUND, fg=Colours.GUIDE_LINK, cursor="hand2")
         self.guidelink.bind("<Button-1>", lambda e: openguide())
+
+        """Widget placment"""
 
         self.inputFrame.grid(padx=50, sticky="n")
         self.subFrame.grid(sticky="w")
@@ -928,42 +1003,62 @@ class EncryptMenu(tk.Frame):
         self.horizontalSeparator2.grid(sticky="we")
         self.subFrame4.grid()
         self.subtext.grid(sticky="w", pady=(8, 0))
-        self.keyBox.grid(padx=10, pady=10, ipady=5)
+        self.keyBox.grid(padx=10, pady=8, ipady=3)
         self.horizontalSeparator3.grid(sticky="we")
         self.subFrame5.grid()
         self.subtext2.grid(sticky="w", pady=(8, 0))
-        self.keyBox2.grid(padx=10, pady=10, ipady=5)
+        self.keyBox2.grid(padx=10, pady=8, ipady=3)
         self.horizontalSeparator4.grid(sticky="we")
-        self.subFrame6.grid(sticky="w", padx=10, pady=10)
+        self.subFrame6.grid()
+        self.subtext3.grid(sticky="w", pady=(8, 0))
+        self.keyBox3.grid(padx=10, pady=8, ipady=3)
+        self.horizontalSeparator5.grid(sticky="we")
+        self.subFrame7.grid(sticky="w", padx=10, pady=10)
         self.encryptButton.grid()
 
         self.outputFrame.grid(column=2, row=0, padx=50, sticky="n")
-        self.subFrame7.grid(sticky="w")
+        self.subFrame8.grid(sticky="w")
         self.title2.grid(padx=16, pady=16)
         self.copyButton2.grid(column=1, row=0, padx=5)
-        self.horizontalSeparator5.grid(sticky="we")
-        self.subFrame8.grid(sticky="w")
+        self.horizontalSeparator6.grid(sticky="we")
+        self.subFrame9.grid(sticky="w")
         self.outputBox.grid(padx=16, pady=20)
         self.outputScrollbar.grid(row=0, column=1, sticky='nsew')
         self.subFrameGuide.grid(sticky="w")
 
+        """ Hover effects """
+
+        self.encryptButton.bind("<Enter>", lambda e: self.encryptButton.configure(
+            bg=ButtonStyle.ENCRYPT2_BUTTON["activebackground"]))
+        self.encryptButton.bind("<Leave>", lambda e: self.encryptButton.configure(
+            bg=ButtonStyle.ENCRYPT2_BUTTON["bg"]))
+        self.copyButton.bind("<Enter>", lambda e: self.copyButton.configure(
+            bg=ButtonStyle.COPY_BUTTON["activebackground"]))
+        self.copyButton.bind("<Leave>", lambda e: self.copyButton.configure(
+            bg=ButtonStyle.COPY_BUTTON["bg"]))
+        self.copyButton2.bind("<Enter>", lambda e: self.copyButton2.configure(
+            bg=ButtonStyle.COPY_BUTTON["activebackground"]))
+        self.copyButton2.bind("<Leave>", lambda e: self.copyButton2.configure(
+            bg=ButtonStyle.COPY_BUTTON["bg"]))
+
     def fileSection(self):
         def uploadFile():
             if self.cipherMode == "Base64":
-                fileObj = tk.filedialog.askopenfile(title='Choose any file to encrypt', filetypes=[("Select files", "*.*")])
+                self.fileObj = tk.filedialog.askopenfile(title='Choose any file to encrypt', filetypes=[("Select files", "*.*")])
             else:
-                fileObj = tk.filedialog.askopenfile(title='Choose a text file to encrypt', filetypes=[("Select files", "*.txt")])
+                self.fileObj = tk.filedialog.askopenfile(title='Choose a text file to encrypt', filetypes=[("Select files", "*.txt")])
 
-            # An error is thrown if the dialog box is closed without an file chosen
+            # An error is thrown if the dialog box is closed without a file chosen
             try:
-                self.filepath = os.path.split(fileObj.name)[0]
-                self.filename = os.path.basename(fileObj.name)
+                self.filepath = os.path.split(self.fileObj.name)[0]
+                self.filename = os.path.basename(self.fileObj.name)
             except:
                 return None
 
-            if os.path.getsize(fileObj.name) > 1000000:
+            # If image size is greater than 1MB, it is not accepted
+            if os.path.getsize(self.fileObj.name) > 1000000:
                 self.fileInfo.grid(sticky="w", padx=10, pady=(5, 0))
-                self.fileInfo.configure(fg="red")
+                self.fileInfo.configure(fg=Colours.ERROR)
                 self.fileInfo_text.set("ERROR: File size too large to upload.")
             else:
                 self.fileInfo.grid(sticky="w", padx=10, pady=(5, 0))
@@ -975,47 +1070,62 @@ class EncryptMenu(tk.Frame):
                 self.errorMessage.set("")
 
                 self.status.config(fg=Colours.STATUS_WAIT)
-                self.statusMessage.set("Awaiting key input")
+                self.statusMessage.set("Awaiting key input...")
 
-        def encryptFile():
+        def encryptFile(k):
+            try:
+                BLANK, (newFilepath, timeTaken) = multicrypt.encrypt(filename=self.filename, filepath=self.filepath, passKey=k,
+                    cipher=self.cipher, dataformat=self.dataFormat, cipherMode=self.cipherMode)
+            except Exception as ex:
+                self.encryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.ERROR)
+                self.statusMessage.set("File encryption failed!")
+                print(ex)
+            else:
+                self.encryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.STATUS_OK)
+                sMessage = "File encrypted successfully!\n\nFilepath: {}\n\nTime taken: {:.2f}s"
+                self.statusMessage.set(sMessage.format(newFilepath, timeTaken))
+
+
+        def encryptFileController():
             self.error.grid(sticky="w", pady=(5, 0))
-            self.status.config(fg=Colours.STATUS_ERROR)
+            self.status.config(fg=Colours.ERROR)
+
             k = self.keyBox.get()
+
+            """ Input validation """
 
             if self.filepath is None:
                 self.errorMessage.set("No file uploaded.")
                 self.statusMessage.set("File encryption failed!\nCheck ERROR message.")
                 return None
 
-            if k == "":
+            elif k == "":
                 self.errorMessage.set("The key field is empty.")
                 self.statusMessage.set("File encryption failed!\nCheck ERROR message.")
                 return None
 
-            if len(k) < 8:
+            elif len(k) < 8:
                 self.errorMessage.set("The key must be at least 8 characters long.")
                 self.statusMessage.set("File encryption failed!\nCheck ERROR message.")
                 return None
 
             # ONLY for Vigenere Cipher in CLASSIC mode
-            if self.cipher == "Vigenere Cipher" and self.cipherMode == "Classic" and not(k.isalpha()):
+            elif self.cipher == "Vigenere Cipher" and self.cipherMode == "Classic" and not(k.isalpha()):
                 self.errorMessage.set("The key must not contain any ASCII characters.")
-                self.guidelink.grid_forget()
+                self.statusMessage.set("File encryption failed!\nCheck ERROR message.")
                 return None
 
-            self.error.grid_forget()  # Removes the error message
-            self.errorMessage.set("")
-
-            try:
-                BLANK, newFilepath = multicrypt.encrypt(filename=self.filename, filepath=self.filepath, passKey=k,
-                    cipher=self.cipher, dataformat=self.dataFormat, cipherMode=self.cipherMode)
-            except Exception as ex:
-                self.statusMessage.set("File encryption failed!")
-                self.status.config(fg=Colours.STATUS_ERROR)
-                print(ex)
             else:
-                self.statusMessage.set("File encrypted successfully!\n\nFilepath: {}".format(newFilepath))
-                self.status.config(fg=Colours.STATUS_OK)
+                self.error.grid_forget()
+                self.errorMessage.set("")
+                self.status.config(fg=Colours.STATUS_WAIT)
+                self.statusMessage.set("Encrypting file...")
+                self.encryptButton.configure(state="disabled", cursor="X_cursor")
+
+                # Allows the application to load the above before starting the decryption
+                threading.Timer(1, encryptFile, args=[k]).start()
 
         self.filepath = None
         self.filename = None
@@ -1088,7 +1198,7 @@ class EncryptMenu(tk.Frame):
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
         self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.encryptButton = tk.Button(self.subFrame5, text="Encrypt", command=lambda: encryptFile(),
+        self.encryptButton = tk.Button(self.subFrame5, text="Encrypt", command=lambda: encryptFileController(),
             **ButtonStyle.ENCRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame5, textvariable=self.errorMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
@@ -1102,6 +1212,8 @@ class EncryptMenu(tk.Frame):
         self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
         self.status = tk.Label(self.subFrame8, textvariable=self.statusMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+
+        """Widget placment"""
 
         self.inputFrame.grid(padx=50, sticky="ns")
         self.subFrame.grid(sticky="w")
@@ -1125,23 +1237,35 @@ class EncryptMenu(tk.Frame):
         self.subFrame8.grid(sticky="w")
         self.status.grid(sticky="w", padx=10, pady=(5, 0))
 
+        """ Hover effects """
+
+        self.encryptButton.bind("<Enter>", lambda e: self.encryptButton.configure(
+            bg=ButtonStyle.ENCRYPT2_BUTTON["activebackground"]))
+        self.encryptButton.bind("<Leave>", lambda e: self.encryptButton.configure(
+            bg=ButtonStyle.ENCRYPT2_BUTTON["bg"]))
+        self.upload_fileButton.bind("<Enter>", lambda e: self.upload_fileButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["activebackground"]))
+        self.upload_fileButton.bind("<Leave>", lambda e: self.upload_fileButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["bg"]))
+
     def fileSectionForTripleDES(self):
         def uploadFile():
             if self.cipherMode == "Base64":
-                fileObj = tk.filedialog.askopenfile(title='Choose any file to encrypt', filetypes=[("Select files", "*.*")])
+                self.fileObj = tk.filedialog.askopenfile(title='Choose any file to encrypt', filetypes=[("Select files", "*.*")])
             else:
-                fileObj = tk.filedialog.askopenfile(title='Choose a text file to encrypt', filetypes=[("Select files", "*.txt")])
+                self.fileObj = tk.filedialog.askopenfile(title='Choose a text file to encrypt', filetypes=[("Select files", "*.txt")])
 
-            # An error is thrown if the dialog box is closed without an image chosen
+            # An error is thrown if the dialog box is closed without a file chosen
             try:
-                self.filepath = os.path.split(fileObj.name)[0]
-                self.filename = os.path.basename(fileObj.name)
+                self.filepath = os.path.split(self.fileObj.name)[0]
+                self.filename = os.path.basename(self.fileObj.name)
             except:
                 return None
 
-            if os.path.getsize(fileObj.name) > 1000000:
+            # If image size is greater than 1MB, it is not accepted
+            if os.path.getsize(self.fileObj.name) > 1000000:
                 self.fileInfo.grid(sticky="w", padx=10, pady=(5, 0))
-                self.fileInfo.configure(fg="red")
+                self.fileInfo.configure(fg=Colours.ERROR)
                 self.fileInfo_text.set("ERROR: File size too large to upload.")
             else:
                 self.fileInfo.grid(sticky="w", padx=10, pady=(5, 0))
@@ -1153,53 +1277,77 @@ class EncryptMenu(tk.Frame):
                 self.errorMessage.set("")
 
                 self.status.config(fg=Colours.STATUS_WAIT)
-                self.statusMessage.set("Awaiting key inputs")
+                self.statusMessage.set("Awaiting key inputs...")
 
-        def encryptFile():
+        def encryptFile(k, k2, k3):
+            try:
+                BLANK, (newFilepath, timeTaken) = multicrypt.encrypt(filename=self.filename, filepath=self.filepath, passKey=(k, k2, k3),
+                    cipher=self.cipher, dataformat=self.dataFormat, cipherMode=self.cipherMode)
+            except Exception as ex:
+                self.encryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.ERROR)
+                self.statusMessage.set("File encryption failed!")
+                print(ex)
+            else:
+                self.encryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.STATUS_OK)
+                sMessage = "File encrypted successfully!\n\nFilepath: {}\n\nTime taken: {:.2f}s"
+                self.statusMessage.set(sMessage.format(newFilepath, timeTaken))
+
+        def encryptFileController():
             self.error.grid(sticky="w", pady=(5, 0))
-            self.status.config(fg=Colours.STATUS_ERROR)
+            self.status.config(fg=Colours.ERROR)
 
             k = self.keyBox.get()
             k2 = self.keyBox2.get()
+            k3 = self.keyBox3.get()
+
+            """ Input validation """
 
             if self.filepath is None:
                 self.errorMessage.set("No file uploaded.")
                 self.statusMessage.set("File encryption failed!\nCheck ERROR message.")
                 return None
 
-            if k == "":
-                self.errorMessage.set("The key field is empty.")
+            elif k == "":
+                self.errorMessage.set("The first key field is empty.")
                 self.statusMessage.set("File encryption failed!\nCheck ERROR message.")
                 return None
 
-            if len(k) < 8:
-                self.errorMessage.set("The key must be at least 8 characters long.")
+            elif len(k) < 8:
+                self.errorMessage.set("The first key must be at least 8 characters long.")
                 self.statusMessage.set("File encryption failed!\nCheck ERROR message.")
                 return None
 
-            if k2 == "":
-                self.errorMessage.set("The key field is empty.")
+            elif k2 == "":
+                self.errorMessage.set("The second key field is empty.")
                 self.statusMessage.set("File encryption failed!\nCheck ERROR message.")
                 return None
 
-            if len(k2) < 8:
-                self.errorMessage.set("The key must be at least 8 characters long.")
+            elif len(k2) < 8:
+                self.errorMessage.set("The second key must be at least 8 characters long.")
                 self.statusMessage.set("File encryption failed!\nCheck ERROR message.")
                 return None
 
-            self.error.grid_forget()
-            self.errorMessage.set("")
+            elif k3 == "":
+                self.errorMessage.set("The third key field is empty.")
+                self.statusMessage.set("File encryption failed!\nCheck ERROR message.")
+                return None
 
-            try:
-                BLANK, newFilepath = multicrypt.encrypt(filename=self.filename, filepath=self.filepath,
-                    passKey=(k, k2), cipher=self.cipher, dataformat=self.dataFormat, cipherMode=self.cipherMode)
-            except Exception as ex:
-                self.statusMessage.set("File encryption failed!")
-                self.status.config(fg=Colours.STATUS_ERROR)
-                print(ex)
+            elif len(k3) < 8:
+                self.errorMessage.set("The third key must be at least 8 characters long.")
+                self.statusMessage.set("File encryption failed!\nCheck ERROR message.")
+                return None
+
             else:
-                self.statusMessage.set("File encrypted successfully!\n\nFilepath: {}".format(newFilepath))
-                self.status.config(fg=Colours.STATUS_OK)
+                self.error.grid_forget()
+                self.errorMessage.set("")
+                self.status.config(fg=Colours.STATUS_WAIT)
+                self.statusMessage.set("Encrypting file...")
+                self.encryptButton.configure(state="disabled", cursor="X_cursor")
+
+                # Allows the application to load the above before starting the decryption
+                threading.Timer(1, encryptFile, args=[k, k2, k3]).start()
 
         self.filepath = None
         self.filename = None
@@ -1263,33 +1411,49 @@ class EncryptMenu(tk.Frame):
         self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
+
+        # Key section 1
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+
+        # Key section 2
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox2 = tk.Entry(self.subFrame5, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
+
+        # Key section 3
         self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.encryptButton = tk.Button(self.subFrame6, text="Encrypt", command=lambda: encryptFile(),
+        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
+        self.keyBox3 = tk.Entry(self.subFrame6, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
+            highlightcolor="orange", highlightbackground="grey")
+
+        self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
+        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.encryptButton = tk.Button(self.subFrame7, text="Encrypt", command=lambda: encryptFileController(),
             **ButtonStyle.ENCRYPT2_BUTTON)
-        self.error = tk.Label(self.subFrame6, textvariable=self.errorMessage, wraplength=200, justify="left",
+        self.error = tk.Label(self.subFrame7, textvariable=self.errorMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Status frame section"""
 
         self.statusFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame7 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame7, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
-        self.horizontalSeparator5 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
         self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.status = tk.Label(self.subFrame8, textvariable=self.statusMessage, wraplength=200, justify="left",
+        self.title2 = tk.Label(self.subFrame8, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.horizontalSeparator6 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
+        self.subFrame9 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
+        self.status = tk.Label(self.subFrame9, textvariable=self.statusMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+
+        """Widget placment"""
 
         self.inputFrame.grid(padx=50, sticky="ns")
         self.subFrame.grid(sticky="w")
@@ -1301,21 +1465,36 @@ class EncryptMenu(tk.Frame):
         self.horizontalSeparator2.grid(sticky="we")
         self.subFrame4.grid()
         self.subtext.grid(sticky="w", pady=(8, 0))
-        self.keyBox.grid(padx=10, pady=10, ipady=5)
+        self.keyBox.grid(padx=10, pady=8, ipady=3)
         self.horizontalSeparator3.grid(sticky="we")
         self.subFrame5.grid()
         self.subtext2.grid(sticky="w", pady=(8, 0))
-        self.keyBox2.grid(padx=10, pady=10, ipady=5)
+        self.keyBox2.grid(padx=10, pady=8, ipady=3)
         self.horizontalSeparator4.grid(sticky="we")
-        self.subFrame6.grid(sticky="w", padx=10, pady=10)
+        self.subFrame6.grid()
+        self.subtext3.grid(sticky="w", pady=(8, 0))
+        self.keyBox3.grid(padx=10, pady=8, ipady=3)
+        self.horizontalSeparator5.grid(sticky="we")
+        self.subFrame7.grid(sticky="w", padx=10, pady=10)
         self.encryptButton.grid()
 
         self.statusFrame.grid(column=2, row=0, padx=50, sticky="ns")
-        self.subFrame7.grid(sticky="w")
-        self.title2.grid(padx=(16, 50), pady=16)
-        self.horizontalSeparator5.grid(sticky="we")
         self.subFrame8.grid(sticky="w")
+        self.title2.grid(padx=(16, 50), pady=16)
+        self.horizontalSeparator6.grid(sticky="we")
+        self.subFrame9.grid(sticky="w")
         self.status.grid(sticky="w", padx=10, pady=(5, 0))
+
+        """ Hover effects """
+
+        self.encryptButton.bind("<Enter>", lambda e: self.encryptButton.configure(
+            bg=ButtonStyle.ENCRYPT2_BUTTON["activebackground"]))
+        self.encryptButton.bind("<Leave>", lambda e: self.encryptButton.configure(
+            bg=ButtonStyle.ENCRYPT2_BUTTON["bg"]))
+        self.upload_fileButton.bind("<Enter>", lambda e: self.upload_fileButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["activebackground"]))
+        self.upload_fileButton.bind("<Leave>", lambda e: self.upload_fileButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["bg"]))
 
     def imageSection(self):
         def uploadImage():
@@ -1328,12 +1507,14 @@ class EncryptMenu(tk.Frame):
             except:
                 return None
 
+            # If image size is greater than 1MB, it is not accepted
             if os.path.getsize(self.imgObj.name) > 1000000:
                 self.imageInfo.grid(sticky="w", padx=10, pady=(5, 0))
-                self.imageInfo.configure(fg="red")
-                self.imageInfo_text.set("ERROR: File size too large to upload.")
+                self.imageInfo.configure(fg=Colours.ERROR)
+                self.imageInfo_text.set("ERROR: Image size too large to upload.")
             else:
                 self.imageInfo.grid(sticky="w", padx=10, pady=(5, 0))
+                self.imageInfo.configure(fg=Colours.INFO)
                 self.imageInfo_text.set("Image uploaded successfully!\n\nFilepath: {}\nFilename: {}".format(
                     self.filepath, self.filename))
 
@@ -1341,42 +1522,55 @@ class EncryptMenu(tk.Frame):
                 self.errorMessage.set("")
 
                 self.status.config(fg=Colours.STATUS_WAIT)
-                self.statusMessage.set("Awaiting key input")
+                self.statusMessage.set("Awaiting key input...")
 
-        def encryptImage():
+        def encryptImage(k):
+            try:
+                BLANK, (newFilepath, timeTaken) = multicrypt.encrypt(filename=self.filename, filepath=self.filepath,
+                    passKey=k, cipher=self.cipher, dataformat=self.dataFormat)
+            except Exception as ex:
+                self.encryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.ERROR)
+                self.statusMessage.set("Image encryption failed!")
+                print(ex)
+            else:
+                self.encryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.STATUS_OK)
+                sMessage = "Image encrypted successfully!\n\nFilepath: {}\n\nTime taken: {:.2f}s"
+                self.statusMessage.set(sMessage.format(newFilepath, timeTaken))
+
+        def encryptImageController():
             self.error.grid(sticky="w", pady=(5, 0))
-            self.status.config(fg=Colours.STATUS_ERROR)
+            self.status.config(fg=Colours.ERROR)
 
             k = self.keyBox.get()
 
+            """ Input validation """
+
             if self.filepath is None:
-                self.errorMessage.set("No file uploaded.")
+                self.errorMessage.set("No image uploaded.")
                 self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
                 return None
 
-            if k == "":
+            elif k == "":
                 self.errorMessage.set("The key field is empty.")
                 self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
                 return None
 
-            if len(k) < 8:
+            elif len(k) < 8:
                 self.errorMessage.set("The key must be at least 8 characters long.")
                 self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
                 return None
 
-            self.error.grid_forget()
-            self.errorMessage.set("")
-
-            try:
-                BLANK, newFilepath = multicrypt.encrypt(filename=self.filename, filepath=self.filepath, passKey=k,
-                    cipher=self.cipher, dataformat=self.dataFormat)
-            except Exception as ex:
-                self.statusMessage.set("Image encryption failed!")
-                self.status.config(fg=Colours.STATUS_ERROR)
-                print(ex)
             else:
-                self.statusMessage.set("Image encrypted successfully!\n\nFilepath: {}".format(newFilepath))
-                self.status.config(fg=Colours.STATUS_OK)
+                self.error.grid_forget()
+                self.errorMessage.set("")
+                self.status.config(fg=Colours.STATUS_WAIT)
+                self.statusMessage.set("Encrypting image...")
+                self.encryptButton.configure(state="disabled", cursor="X_cursor")
+
+                # Allows the application to load the above before starting the decryption
+                threading.Timer(1, encryptImage, args=[k]).start()
 
         self.filepath = None
         self.filename = None
@@ -1444,7 +1638,7 @@ class EncryptMenu(tk.Frame):
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
         self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.encryptButton = tk.Button(self.subFrame5, text="Encrypt", command=lambda: encryptImage(),
+        self.encryptButton = tk.Button(self.subFrame5, text="Encrypt", command=lambda: encryptImageController(),
             **ButtonStyle.ENCRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame5, textvariable=self.errorMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
@@ -1458,6 +1652,8 @@ class EncryptMenu(tk.Frame):
         self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
         self.status = tk.Label(self.subFrame8, textvariable=self.statusMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+
+        """Widget placment"""
 
         self.inputFrame.grid(padx=50, sticky="ns")
         self.subFrame.grid(sticky="w")
@@ -1481,6 +1677,17 @@ class EncryptMenu(tk.Frame):
         self.subFrame8.grid(sticky="w")
         self.status.grid(sticky="w", padx=10, pady=(5, 0))
 
+        """ Hover effects """
+
+        self.encryptButton.bind("<Enter>", lambda e: self.encryptButton.configure(
+            bg=ButtonStyle.ENCRYPT2_BUTTON["activebackground"]))
+        self.encryptButton.bind("<Leave>", lambda e: self.encryptButton.configure(
+            bg=ButtonStyle.ENCRYPT2_BUTTON["bg"]))
+        self.upload_imageButton.bind("<Enter>", lambda e: self.upload_imageButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["activebackground"]))
+        self.upload_imageButton.bind("<Leave>", lambda e: self.upload_imageButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["bg"]))
+
     def imageSectionForTripleDES(self):
         def uploadImage():
             self.imgObj = tk.filedialog.askopenfile(title='Choose an image to encrypt', filetypes=[("Select images", "*.jpg *.png")])
@@ -1492,12 +1699,14 @@ class EncryptMenu(tk.Frame):
             except:
                 return None
 
+            # If image size is greater than 1MB, it is not accepted
             if os.path.getsize(self.imgObj.name) > 1000000:
                 self.imageInfo.grid(sticky="w", padx=10, pady=(5, 0))
-                self.imageInfo.configure(fg="red")
-                self.imageInfo_text.set("ERROR: File size too large to upload.")
+                self.imageInfo.configure(fg=Colours.ERROR)
+                self.imageInfo_text.set("ERROR: Image size too large to upload.")
             else:
                 self.imageInfo.grid(sticky="w", padx=10, pady=(5, 0))
+                self.imageInfo.configure(fg=Colours.INFO)
                 self.imageInfo_text.set("Image uploaded successfully!\n\nFilepath: {}\nFilename: {}".format(
                     self.filepath, self.filename))
 
@@ -1505,55 +1714,77 @@ class EncryptMenu(tk.Frame):
                 self.errorMessage.set("")
 
                 self.status.config(fg=Colours.STATUS_WAIT)
-                self.statusMessage.set("Awaiting key input")
+                self.statusMessage.set("Awaiting key input...")
 
-        def encryptImage():
-            self.error.grid(sticky="w", pady=(5, 0))
-            self.status.config(fg=Colours.STATUS_WAIT)
-            k = self.keyBox.get()
-            k2 = self.keyBox2.get()
-
-            if self.filepath is None:
-                self.errorMessage.set("No file uploaded.")
-                self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
-                return None
-
-            if k == "":
-                self.errorMessage.set("The key field is empty.")
-                self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
-                return None
-
-            if len(k) < 8:
-                self.errorMessage.set("The key must be at least 8 characters long.")
-                self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
-                return None
-
-            if k2 == "":
-                self.errorMessage.set("The key field is empty.")
-                self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
-                return None
-
-            if len(k2) < 8:
-                self.errorMessage.set("The key must be at least 8 characters long.")
-                self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
-                return None
-
-            self.error.grid_forget()
-            self.errorMessage.set("")
-
-            start = time.time()
+        def encryptImage(k, k2, k3):
             try:
-                BLANK, newFilepath = multicrypt.encrypt(filename=self.filename, filepath=self.filepath,
-                    passKey=(k, k2), cipher=self.cipher, dataformat=self.dataFormat)
+                BLANK, (newFilepath, timeTaken) = multicrypt.encrypt(filename=self.filename, filepath=self.filepath,
+                    passKey=(k, k2, k3), cipher=self.cipher, dataformat=self.dataFormat)
             except Exception as ex:
+                self.encryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.ERROR)
                 self.statusMessage.set("Image encryption failed!")
-                self.status.config(fg=Colours.STATUS_ERROR)
                 print(ex)
             else:
-                self.statusMessage.set("Image encrypted successfully!\n\nFilepath: {}".format(newFilepath))
+                self.encryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.STATUS_OK)
-            end = time.time()
-            print(end - start)
+                sMessage = "Image encrypted successfully!\n\nFilepath: {}\n\nTime taken: {:.2f}s"
+                self.statusMessage.set(sMessage.format(newFilepath, timeTaken))
+
+        def encryptImageController():
+            self.error.grid(sticky="w", pady=(5, 0))
+            self.status.config(fg=Colours.STATUS_WAIT)
+
+            k = self.keyBox.get()
+            k2 = self.keyBox2.get()
+            k3 = self.keyBox3.get()
+
+            """ Input validation """
+
+            if self.filepath is None:
+                self.errorMessage.set("No image uploaded.")
+                self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
+                return None
+
+            elif k == "":
+                self.errorMessage.set("The first key field is empty.")
+                self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
+                return None
+
+            elif len(k) < 8:
+                self.errorMessage.set("The first key must be at least 8 characters long.")
+                self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
+                return None
+
+            elif k2 == "":
+                self.errorMessage.set("The second key field is empty.")
+                self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
+                return None
+
+            elif len(k2) < 8:
+                self.errorMessage.set("The second key must be at least 8 characters long.")
+                self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
+                return None
+
+            elif k3 == "":
+                self.errorMessage.set("The third key field is empty.")
+                self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
+                return None
+
+            elif len(k3) < 8:
+                self.errorMessage.set("The third key must be at least 8 characters long.")
+                self.statusMessage.set("Image encryption failed!\nCheck ERROR message.")
+                return None
+
+            else:
+                self.error.grid_forget()
+                self.errorMessage.set("")
+                self.status.config(fg=Colours.STATUS_WAIT)
+                self.statusMessage.set("Encrypting image...")
+                self.encryptButton.configure(state="disabled", cursor="X_cursor")
+
+                # Allows the application to load the above before starting the decryption
+                threading.Timer(1, encryptImage, args=[k, k2, k3]).start()
 
         self.filepath = None
         self.filename = None
@@ -1612,32 +1843,49 @@ class EncryptMenu(tk.Frame):
         self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
+
+        # Key section 1
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+
+        # Key section 2
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
         self.keyBox2 = tk.Entry(self.subFrame5, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
+
+        # Key section 3
         self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.encryptButton = tk.Button(self.subFrame6, text="Encrypt", command=lambda: encryptImage(),
+        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
+        self.keyBox3 = tk.Entry(self.subFrame6, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
+            highlightcolor="orange", highlightbackground="grey")
+
+        self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
+        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.encryptButton = tk.Button(self.subFrame7, text="Encrypt", command=lambda: encryptImageController(),
             **ButtonStyle.ENCRYPT2_BUTTON)
-        self.error = tk.Label(self.subFrame6, textvariable=self.errorMessage, wraplength=200, justify="left",
+        self.error = tk.Label(self.subFrame7, textvariable=self.errorMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Status frame section"""
 
         self.statusFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame7 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame7, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
-        self.horizontalSeparator5 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
         self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.status = tk.Label(self.subFrame8, textvariable=self.statusMessage, wraplength=200, justify="left",
+        self.title2 = tk.Label(self.subFrame8, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.horizontalSeparator6 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
+        self.subFrame9 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
+        self.status = tk.Label(self.subFrame9, textvariable=self.statusMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+
+        """Widget placment"""
 
         self.inputFrame.grid(padx=50, sticky="ns")
         self.subFrame.grid(sticky="w")
@@ -1649,21 +1897,36 @@ class EncryptMenu(tk.Frame):
         self.horizontalSeparator2.grid(sticky="we")
         self.subFrame4.grid()
         self.subtext.grid(sticky="w", pady=(8, 0))
-        self.keyBox.grid(padx=10, pady=10, ipady=5)
+        self.keyBox.grid(padx=10, pady=8, ipady=3)
         self.horizontalSeparator3.grid(sticky="we")
         self.subFrame5.grid()
         self.subtext2.grid(sticky="w", pady=(8, 0))
-        self.keyBox2.grid(padx=10, pady=10, ipady=5)
+        self.keyBox2.grid(padx=10, pady=8, ipady=3)
         self.horizontalSeparator4.grid(sticky="we")
-        self.subFrame6.grid(sticky="w", padx=10, pady=10)
+        self.subFrame6.grid()
+        self.subtext3.grid(sticky="w", pady=(8, 0))
+        self.keyBox3.grid(padx=10, pady=8, ipady=3)
+        self.horizontalSeparator5.grid(sticky="we")
+        self.subFrame7.grid(sticky="w", padx=10, pady=10)
         self.encryptButton.grid()
 
         self.statusFrame.grid(column=2, row=0, padx=50, sticky="ns")
-        self.subFrame7.grid(sticky="w")
-        self.title2.grid(padx=(16, 50), pady=16)
-        self.horizontalSeparator5.grid(sticky="we")
         self.subFrame8.grid(sticky="w")
+        self.title2.grid(padx=(16, 50), pady=16)
+        self.horizontalSeparator6.grid(sticky="we")
+        self.subFrame9.grid(sticky="w")
         self.status.grid(sticky="w", padx=10, pady=(5, 0))
+
+        """ Hover effects """
+
+        self.encryptButton.bind("<Enter>", lambda e: self.encryptButton.configure(
+            bg=ButtonStyle.ENCRYPT2_BUTTON["activebackground"]))
+        self.encryptButton.bind("<Leave>", lambda e: self.encryptButton.configure(
+            bg=ButtonStyle.ENCRYPT2_BUTTON["bg"]))
+        self.upload_imageButton.bind("<Enter>", lambda e: self.upload_imageButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["activebackground"]))
+        self.upload_imageButton.bind("<Leave>", lambda e: self.upload_imageButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["bg"]))
 
 
 class DecryptMenu(tk.Frame):
@@ -1725,6 +1988,8 @@ class DecryptMenu(tk.Frame):
             self.outputBox.configure(state="disabled", cursor="X_cursor")
             self.error.grid(sticky="w", pady=(5, 0))
 
+            """ Input validation """
+
             if c == "":
                 self.errorMessage.set("The ciphertext field is empty.")
                 return None
@@ -1750,9 +2015,9 @@ class DecryptMenu(tk.Frame):
                     dataformat=self.dataFormat, cipherMode=self.cipherMode)
             except Exception as exc:
                 print(exc)
-                self.outputBox.configure(state="normal", cursor="xterm", fg="red")
+                self.outputBox.configure(state="normal", cursor="xterm", fg=Colours.ERROR)
                 self.outputBox.insert("1.0", "ERROR: Decryption failed.")
-                self.outputBox.configure(state="disabled", cursor="X_cursor", fg="red")
+                self.outputBox.configure(state="disabled", cursor="X_cursor", fg=Colours.ERROR)
                 self.copyButton2.configure(state="disabled", bg="grey", fg="#FFF")
             else:
                 self.outputBox.configure(state="normal", cursor="xterm")
@@ -1823,8 +2088,8 @@ class DecryptMenu(tk.Frame):
         self.sectionTag.grid(column=2, row=0, pady=(10, 0), padx=10)
         self.sectionTag2.grid(column=3, row=0, pady=(10, 0), padx=10)
 
-        # DES cipher has no modes so this won't display the mode tag
-        if self.cipher == "DES Cipher":
+        # DES cipher and AES cipher have no modes so this won't display the mode tag
+        if self.cipher in ("DES Cipher", "AES Cipher"):
             self.sectionTag4.grid(column=5, row=0, sticky="ns", ipadx=40, pady=(10, 0), padx=10)
         else:
             self.sectionTag3.grid(column=4, row=0, pady=(10, 0), padx=10)
@@ -1857,15 +2122,16 @@ class DecryptMenu(tk.Frame):
         self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
+
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
+
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-
-        self.encryptButton = tk.Button(self.subFrame5, text="Decrypt", command=lambda: updateOutputBox(),
+        self.decryptButton = tk.Button(self.subFrame5, text="Decrypt", command=lambda: updateOutputBox(),
             **ButtonStyle.DECRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame5, textvariable=self.errorMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
@@ -1890,6 +2156,8 @@ class DecryptMenu(tk.Frame):
             bg=Colours.BACKGROUND, fg=Colours.GUIDE_LINK, cursor="hand2")
         self.guidelink.bind("<Button-1>", lambda e: openguide())
 
+        """Widget placment"""
+
         self.inputFrame.grid(padx=45, sticky="n")
         self.subFrame.grid(sticky="w")
         self.title.grid(padx=16, pady=16)
@@ -1908,7 +2176,7 @@ class DecryptMenu(tk.Frame):
         self.keyBox.grid(padx=10, pady=10, ipady=5)
         self.horizontalSeparator3.grid(sticky="we")
         self.subFrame5.grid(sticky="w", padx=10, pady=10)
-        self.encryptButton.grid()
+        self.decryptButton.grid()
 
         self.outputFrame.grid(column=2, row=0, padx=45, sticky="n")
         self.subFrame6.grid(sticky="w")
@@ -1919,6 +2187,21 @@ class DecryptMenu(tk.Frame):
         self.outputBox.grid(padx=16, pady=16)
         self.outputScrollbar.grid(row=0, column=1, sticky='nsew')
         self.subFrameGuide.grid(sticky="w")
+
+        """ Hover effects """
+
+        self.decryptButton.bind("<Enter>", lambda e: self.decryptButton.configure(
+            bg=ButtonStyle.DECRYPT2_BUTTON["activebackground"]))
+        self.decryptButton.bind("<Leave>", lambda e: self.decryptButton.configure(
+            bg=ButtonStyle.DECRYPT2_BUTTON["bg"]))
+        self.copyButton.bind("<Enter>", lambda e: self.copyButton.configure(
+            bg=ButtonStyle.COPY_BUTTON["activebackground"]))
+        self.copyButton.bind("<Leave>", lambda e: self.copyButton.configure(
+            bg=ButtonStyle.COPY_BUTTON["bg"]))
+        self.copyButton2.bind("<Enter>", lambda e: self.copyButton2.configure(
+            bg=ButtonStyle.COPY_BUTTON["activebackground"]))
+        self.copyButton2.bind("<Leave>", lambda e: self.copyButton2.configure(
+            bg=ButtonStyle.COPY_BUTTON["bg"]))
 
     def messageSectionForTripleDES(self):
         def updateOutputBox():
@@ -1931,10 +2214,13 @@ class DecryptMenu(tk.Frame):
             c = self.inputBox.get()
             k = self.keyBox.get()
             k2 = self.keyBox2.get()
+            k3 = self.keyBox3.get()
 
             self.outputBox.delete("1.0", "end")
             self.outputBox.configure(state="disabled", cursor="X_cursor")
             self.error.grid(sticky="w", pady=(5, 0))
+
+            """ Input validation """
 
             if c == "":
                 self.errorMessage.set("The ciphertext field is empty.")
@@ -1956,17 +2242,25 @@ class DecryptMenu(tk.Frame):
                 self.errorMessage.set("The second key must be at least 8 characters long.")
                 return None
 
+            if k3 == "":
+                self.errorMessage.set("The third key field is empty.")
+                return None
+
+            if len(k3) < 8:
+                self.errorMessage.set("The third key must be at least 8 characters long.")
+                return None
+
             self.error.grid_forget()  # Removes the error message
             self.errorMessage.set("")
 
             try:
-                self.guide_data, plainText = multicrypt.decrypt(ciphertext=c, passKey=(k, k2), cipher=self.cipher,
+                self.guide_data, plainText = multicrypt.decrypt(ciphertext=c, passKey=(k, k2, k3), cipher=self.cipher,
                     dataformat=self.dataFormat)
             except Exception as exc:
                 print(exc)
-                self.outputBox.configure(state="normal", cursor="xterm", fg="red")
+                self.outputBox.configure(state="normal", cursor="xterm", fg=Colours.ERROR)
                 self.outputBox.insert("1.0", "ERROR: Decryption failed.")
-                self.outputBox.configure(state="disabled", cursor="X_cursor", fg="red")
+                self.outputBox.configure(state="disabled", cursor="X_cursor", fg=Colours.ERROR)
                 self.copyButton2.configure(state="disabled", bg="grey", fg="#FFF")
             else:
                 self.outputBox.configure(state="normal", cursor="xterm")
@@ -2050,20 +2344,34 @@ class DecryptMenu(tk.Frame):
         self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
+
+        # Key section 1
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+
+        # Key section 2
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
         self.keyBox2 = tk.Entry(self.subFrame5, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
+
+        # Key section 3
         self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
+        self.keyBox3 = tk.Entry(self.subFrame6, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
+            highlightcolor="orange", highlightbackground="grey")
 
-        self.encryptButton = tk.Button(self.subFrame6, text="Decrypt", command=lambda: updateOutputBox(),
+        self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
+        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.decryptButton = tk.Button(self.subFrame6, text="Decrypt", command=lambda: updateOutputBox(),
             **ButtonStyle.DECRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame6, textvariable=self.errorMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
@@ -2071,15 +2379,16 @@ class DecryptMenu(tk.Frame):
         """Output frame section"""
 
         self.outputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame7 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame7, text="Plaintext", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
-        self.copyButton2 = tk.Button(self.subFrame7, text="Copy Plaintext", compound="left", image=self.COPY_ICON,
-        command=lambda: copyOutputToClipboard(), **ButtonStyle.COPY_BUTTON)
-        self.horizontalSeparator5 = tk.ttk.Separator(self.outputFrame, orient="horizontal")
         self.subFrame8 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.outputBox = tk.Text(self.subFrame8, width=26, height=10, bd=0, wrap="word", bg=Colours.BACKGROUND,
+        self.title2 = tk.Label(self.subFrame8, text="Plaintext", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.copyButton2 = tk.Button(self.subFrame8, text="Copy Plaintext", compound="left", image=self.COPY_ICON,
+        command=lambda: copyOutputToClipboard(), **ButtonStyle.COPY_BUTTON)
+
+        self.horizontalSeparator6 = tk.ttk.Separator(self.outputFrame, orient="horizontal")
+        self.subFrame9 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
+        self.outputBox = tk.Text(self.subFrame9, width=26, height=10, bd=0, wrap="word", bg=Colours.BACKGROUND,
             fg=Colours.GREY_FOREGROUND, font=Fonts.TEXT, state="disabled", cursor="X_cursor")
-        self.outputScrollbar = tk.Scrollbar(self.subFrame8, command=self.outputBox.yview)
+        self.outputScrollbar = tk.Scrollbar(self.subFrame9, command=self.outputBox.yview)
         self.outputBox['yscrollcommand'] = self.outputScrollbar.set
 
         self.subFrameGuide = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
@@ -2087,6 +2396,8 @@ class DecryptMenu(tk.Frame):
         self.guidelink = tk.Label(self.outputFrame, text="Want to learn how the process is done? Click here!",
             bg=Colours.BACKGROUND, fg=Colours.GUIDE_LINK, cursor="hand2")
         self.guidelink.bind("<Button-1>", lambda e: openguide())
+
+        """Widget placment"""
 
         self.inputFrame.grid(padx=50, sticky="n")
         self.subFrame.grid(sticky="w")
@@ -2103,36 +2414,55 @@ class DecryptMenu(tk.Frame):
         self.horizontalSeparator2.grid(sticky="we")
         self.subFrame4.grid()
         self.subtext.grid(sticky="w", pady=(8, 0))
-        self.keyBox.grid(padx=10, pady=10, ipady=5)
+        self.keyBox.grid(padx=10, pady=8, ipady=3)
         self.horizontalSeparator3.grid(sticky="we")
         self.subFrame5.grid()
         self.subtext2.grid(sticky="w", pady=(8, 0))
-        self.keyBox2.grid(padx=10, pady=10, ipady=5)
+        self.keyBox2.grid(padx=10, pady=8, ipady=3)
         self.horizontalSeparator4.grid(sticky="we")
-        self.subFrame6.grid(sticky="w", padx=10, pady=10)
-        self.encryptButton.grid()
+        self.subFrame6.grid()
+        self.subtext3.grid(sticky="w", pady=(8, 0))
+        self.keyBox3.grid(padx=10, pady=8, ipady=3)
+        self.horizontalSeparator5.grid(sticky="we")
+        self.subFrame7.grid(sticky="w", padx=10, pady=10)
+        self.decryptButton.grid()
 
         self.outputFrame.grid(column=2, row=0, padx=50, sticky="n")
-        self.subFrame7.grid(sticky="w")
+        self.subFrame8.grid(sticky="w")
         self.title2.grid(padx=(16, 50), pady=16)
         self.copyButton2.grid(column=1, row=0, padx=5)
-        self.horizontalSeparator5.grid(sticky="we")
-        self.subFrame8.grid(sticky="w")
+        self.horizontalSeparator6.grid(sticky="we")
+        self.subFrame9.grid(sticky="w")
         self.outputBox.grid(padx=16, pady=20)
         self.outputScrollbar.grid(row=0, column=1, sticky='nsew')
         self.subFrameGuide.grid(sticky="w")
 
+        """ Hover effects """
+
+        self.decryptButton.bind("<Enter>", lambda e: self.decryptButton.configure(
+            bg=ButtonStyle.DECRYPT2_BUTTON["activebackground"]))
+        self.decryptButton.bind("<Leave>", lambda e: self.decryptButton.configure(
+            bg=ButtonStyle.DECRYPT2_BUTTON["bg"]))
+        self.copyButton.bind("<Enter>", lambda e: self.copyButton.configure(
+            bg=ButtonStyle.COPY_BUTTON["activebackground"]))
+        self.copyButton.bind("<Leave>", lambda e: self.copyButton.configure(
+            bg=ButtonStyle.COPY_BUTTON["bg"]))
+        self.copyButton2.bind("<Enter>", lambda e: self.copyButton2.configure(
+            bg=ButtonStyle.COPY_BUTTON["activebackground"]))
+        self.copyButton2.bind("<Leave>", lambda e: self.copyButton2.configure(
+            bg=ButtonStyle.COPY_BUTTON["bg"]))
+
     def fileSection(self):
         def uploadFile():
             if self.cipherMode == "Base64":
-                fileObj = tk.filedialog.askopenfile(title='Choose any file to decrypt', filetypes=[("Select files", "*.*")])
+                self.fileObj = tk.filedialog.askopenfile(title='Choose any file to decrypt', filetypes=[("Select files", "*.*")])
             else:
-                fileObj = tk.filedialog.askopenfile(title='Choose a text file to decrypt', filetypes=[("Select files", "*.txt")])
+                self.fileObj = tk.filedialog.askopenfile(title='Choose a text file to decrypt', filetypes=[("Select files", "*.txt")])
 
             # An error is thrown if the dialog box is closed without an image chosen
             try:
-                self.filepath = os.path.split(fileObj.name)[0]
-                self.filename = os.path.basename(fileObj.name)
+                self.filepath = os.path.split(self.fileObj.name)[0]
+                self.filename = os.path.basename(self.fileObj.name)
             except:
                 return None
 
@@ -2145,47 +2475,61 @@ class DecryptMenu(tk.Frame):
             self.errorMessage.set("")
 
             self.status.config(fg=Colours.STATUS_WAIT)
-            self.statusMessage.set("Awaiting key input.")
+            self.statusMessage.set("Awaiting key input...")
 
-        def decryptFile():
+        def decryptFile(k):
+            try:
+                BLANK, (newFilepath, timeTaken) = multicrypt.decrypt(filename=self.filename, filepath=self.filepath, passKey=k,
+                    cipher=self.cipher, dataformat=self.dataFormat, cipherMode=self.cipherMode)
+            except Exception as ex:
+                self.decryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.ERROR)
+                self.statusMessage.set("File decryption failed!")
+                print(ex)
+            else:
+                self.decryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.STATUS_OK)
+                sMessage = "File decrypted successfully!\n\nFilepath: {}\n\nTime taken: {:.2f}s"
+                self.statusMessage.set(sMessage.format(newFilepath, timeTaken))
+
+        def decryptFileController():
             self.error.grid(sticky="w", pady=(5, 0))
-            self.status.config(fg=Colours.STATUS_ERROR)
+            self.status.config(fg=Colours.ERROR)
+
             k = self.keyBox.get()
+
+            """ Input validation """
 
             if self.filepath is None:
                 self.errorMessage.set("No file uploaded.")
                 self.statusMessage.set("File decryption failed!\nCheck ERROR message.")
                 return None
 
-            if k == "":
+            elif k == "":
                 self.errorMessage.set("The key field is empty.")
                 self.statusMessage.set("File decryption failed!\nCheck ERROR message.")
                 return None
 
-            if len(k) < 8:
+            elif len(k) < 8:
                 self.errorMessage.set("The key must be at least 8 characters long.")
                 self.statusMessage.set("File decryption failed!\nCheck ERROR message.")
                 return None
 
             # ONLY for Vigenere Cipher in CLASSIC mode
-            if self.cipher == "Vigenere Cipher" and self.cipherMode == "Classic" and not(k.isalpha()):
+            elif self.cipher == "Vigenere Cipher" and self.cipherMode == "Classic" and not(k.isalpha()):
                 self.errorMessage.set("The key must not contain any ASCII characters.")
-                self.guidelink.grid_forget()
+                self.statusMessage.set("File decryption failed!\nCheck ERROR message.")
                 return None
 
-            self.error.grid_forget()  # Removes the error message
-            self.errorMessage.set("")
-
-            try:
-                BLANK, newFilepath = multicrypt.decrypt(filename=self.filename, filepath=self.filepath, passKey=k,
-                    cipher=self.cipher, dataformat=self.dataFormat, cipherMode=self.cipherMode)
-            except Exception as ex:
-                self.statusMessage.set("File decryption failed!")
-                self.status.config(fg=Colours.STATUS_ERROR)
-                print(ex)
             else:
-                self.statusMessage.set("File decrypted successfully!\n\nFilepath: {}".format(newFilepath))
-                self.status.config(fg=Colours.STATUS_OK)
+                self.error.grid_forget()
+                self.errorMessage.set("")
+                self.status.config(fg=Colours.STATUS_WAIT)
+                self.statusMessage.set("Decrypting file...")
+                self.decryptButton.configure(state="disabled", cursor="X_cursor")
+
+                # Allows the application to load the above before starting the decryption
+                threading.Timer(1, decryptFile, args=[k]).start()
 
         self.filepath = None
         self.filename = None
@@ -2249,16 +2593,17 @@ class DecryptMenu(tk.Frame):
         self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
-        self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
+        self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
+
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.encryptButton = tk.Button(self.subFrame5, text="Decrypt", command=lambda: decryptFile(),
-            **ButtonStyle.ENCRYPT2_BUTTON)
+        self.decryptButton = tk.Button(self.subFrame5, text="Decrypt", command=lambda: decryptFileController(),
+            **ButtonStyle.DECRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame5, textvariable=self.errorMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
 
@@ -2271,6 +2616,8 @@ class DecryptMenu(tk.Frame):
         self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
         self.status = tk.Label(self.subFrame8, textvariable=self.statusMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+
+        """Widget placment"""
 
         self.inputFrame.grid(padx=50, sticky="ns")
         self.subFrame.grid(sticky="w")
@@ -2285,7 +2632,7 @@ class DecryptMenu(tk.Frame):
         self.keyBox.grid(padx=10, pady=10, ipady=5)
         self.horizontalSeparator3.grid(sticky="we")
         self.subFrame5.grid(sticky="w", padx=10, pady=10)
-        self.encryptButton.grid()
+        self.decryptButton.grid()
 
         self.statusFrame.grid(column=2, row=0, padx=50, sticky="ns")
         self.subFrame7.grid(sticky="w")
@@ -2294,17 +2641,28 @@ class DecryptMenu(tk.Frame):
         self.subFrame8.grid(sticky="w")
         self.status.grid(sticky="w", padx=10, pady=(5, 0))
 
+        """ Hover effects """
+
+        self.decryptButton.bind("<Enter>", lambda e: self.decryptButton.configure(
+            bg=ButtonStyle.DECRYPT2_BUTTON["activebackground"]))
+        self.decryptButton.bind("<Leave>", lambda e: self.decryptButton.configure(
+            bg=ButtonStyle.DECRYPT2_BUTTON["bg"]))
+        self.upload_fileButton.bind("<Enter>", lambda e: self.upload_fileButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["activebackground"]))
+        self.upload_fileButton.bind("<Leave>", lambda e: self.upload_fileButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["bg"]))
+
     def fileSectionForTripleDES(self):
         def uploadFile():
             if self.cipherMode == "Base64":
-                fileObj = tk.filedialog.askopenfile(title='Choose any file to decrypt', filetypes=[("Select files", "*.*")])
+                self.fileObj = tk.filedialog.askopenfile(title='Choose any file to decrypt', filetypes=[("Select files", "*.*")])
             else:
-                fileObj = tk.filedialog.askopenfile(title='Choose a text file to decrypt', filetypes=[("Select files", "*.txt")])
+                self.fileObj = tk.filedialog.askopenfile(title='Choose a text file to decrypt', filetypes=[("Select files", "*.txt")])
 
             # An error is thrown if the dialog box is closed without an file chosen
             try:
-                self.filepath = os.path.split(fileObj.name)[0]
-                self.filename = os.path.basename(fileObj.name)
+                self.filepath = os.path.split(self.fileObj.name)[0]
+                self.filename = os.path.basename(self.fileObj.name)
             except:
                 return None
 
@@ -2317,53 +2675,77 @@ class DecryptMenu(tk.Frame):
             self.errorMessage.set("")
 
             self.status.config(fg=Colours.STATUS_WAIT)
-            self.statusMessage.set("Awaiting key inputs.")
+            self.statusMessage.set("Awaiting key inputs...")
 
-        def decryptFile():
+        def decryptFile(k, k2, k3):
+            try:
+                BLANK, (newFilepath, timeTaken) = multicrypt.decrypt(filename=self.filename, filepath=self.filepath, passKey=(k, k2, k3),
+                    cipher=self.cipher, dataformat=self.dataFormat, cipherMode=self.cipherMode)
+            except Exception as ex:
+                self.decryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.ERROR)
+                self.statusMessage.set("File decryption failed!")
+                print(ex)
+            else:
+                self.decryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.STATUS_OK)
+                sMessage = "File decrypted successfully!\n\nFilepath: {}\n\nTime taken: {:.2f}s"
+                self.statusMessage.set(sMessage.format(newFilepath, timeTaken))
+
+        def decryptFileController():
             self.error.grid(sticky="w", pady=(5, 0))
-            self.status.config(fg=Colours.STATUS_ERROR)
+            self.status.config(fg=Colours.ERROR)
 
             k = self.keyBox.get()
             k2 = self.keyBox2.get()
+            k3 = self.keyBox3.get()
+
+            """ Input validation """
 
             if self.filepath is None:
                 self.errorMessage.set("No file uploaded.")
                 self.statusMessage.set("File decryption failed!\nCheck ERROR message.")
                 return None
 
-            if k == "":
-                self.errorMessage.set("The key field is empty.")
+            elif k == "":
+                self.errorMessage.set("The first key field is empty.")
                 self.statusMessage.set("File decryption failed!\nCheck ERROR message.")
                 return None
 
-            if len(k) < 8:
-                self.errorMessage.set("The key must be at least 8 characters long.")
+            elif len(k) < 8:
+                self.errorMessage.set("The first key must be at least 8 characters long.")
                 self.statusMessage.set("File decryption failed!\nCheck ERROR message.")
                 return None
 
-            if k2 == "":
-                self.errorMessage.set("The key field is empty.")
+            elif k2 == "":
+                self.errorMessage.set("The second key field is empty.")
                 self.statusMessage.set("File decryption failed!\nCheck ERROR message.")
                 return None
 
-            if len(k2) < 8:
-                self.errorMessage.set("The key must be at least 8 characters long.")
+            elif len(k2) < 8:
+                self.errorMessage.set("The second key must be at least 8 characters long.")
                 self.statusMessage.set("File decryption failed!\nCheck ERROR message.")
                 return None
 
-            self.error.grid_forget()
-            self.errorMessage.set("")
+            elif k3 == "":
+                self.errorMessage.set("The third key field is empty.")
+                self.statusMessage.set("File decryption failed!\nCheck ERROR message.")
+                return None
 
-            try:
-                BLANK, newFilepath = multicrypt.decrypt(filename=self.filename, filepath=self.filepath,
-                    passKey=(k, k2), cipher=self.cipher, dataformat=self.dataFormat, cipherMode=self.cipherMode)
-            except Exception as ex:
-                self.statusMessage.set("File decryption failed!")
-                self.status.config(fg=Colours.STATUS_ERROR)
-                print(ex)
+            elif len(k3) < 8:
+                self.errorMessage.set("The third key must be at least 8 characters long.")
+                self.statusMessage.set("File decryption failed!\nCheck ERROR message.")
+                return None
+
             else:
-                self.statusMessage.set("File decrypted successfully!\n\nFilepath: {}".format(newFilepath))
-                self.status.config(fg=Colours.STATUS_OK)
+                self.error.grid_forget()
+                self.errorMessage.set("")
+                self.status.config(fg=Colours.STATUS_WAIT)
+                self.statusMessage.set("Decrypting file...")
+                self.decryptButton.configure(state="disabled", cursor="X_cursor")
+
+                # Allows the application to load the above before starting the decryption
+                threading.Timer(1, decryptFile, args=[k, k2, k3]).start()
 
         self.filepath = None
         self.filename = None
@@ -2427,33 +2809,50 @@ class DecryptMenu(tk.Frame):
         self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
+
+        # Key section 1
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+
+        # Key section 2
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
         self.keyBox2 = tk.Entry(self.subFrame5, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
+
+        # Key section 3
         self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.encryptButton = tk.Button(self.subFrame6, text="Decrypt", command=lambda: decryptFile(),
-            **ButtonStyle.ENCRYPT2_BUTTON)
-        self.error = tk.Label(self.subFrame6, textvariable=self.errorMessage, wraplength=200, justify="left",
+        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
+        self.keyBox3 = tk.Entry(self.subFrame6, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
+            highlightcolor="orange", highlightbackground="grey")
+
+        self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
+        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.decryptButton = tk.Button(self.subFrame7, text="Decrypt", command=lambda: decryptFileController(),
+            **ButtonStyle.DECRYPT2_BUTTON)
+        self.error = tk.Label(self.subFrame7, textvariable=self.errorMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Status frame section"""
 
         self.statusFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame7 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame7, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG,
-            font=Fonts.TITLE)
-        self.horizontalSeparator5 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
         self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.status = tk.Label(self.subFrame8, textvariable=self.statusMessage, wraplength=200, justify="left",
+        self.title2 = tk.Label(self.subFrame8, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG,
+            font=Fonts.TITLE)
+        self.horizontalSeparator6 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
+        self.subFrame9 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
+        self.status = tk.Label(self.subFrame9, textvariable=self.statusMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+
+        """Widget placment"""
 
         self.inputFrame.grid(padx=50, sticky="ns")
         self.subFrame.grid(sticky="w")
@@ -2465,21 +2864,36 @@ class DecryptMenu(tk.Frame):
         self.horizontalSeparator2.grid(sticky="we")
         self.subFrame4.grid()
         self.subtext.grid(sticky="w", pady=(8, 0))
-        self.keyBox.grid(padx=10, pady=10, ipady=5)
+        self.keyBox.grid(padx=10, pady=8, ipady=3)
         self.horizontalSeparator3.grid(sticky="we")
         self.subFrame5.grid()
         self.subtext2.grid(sticky="w", pady=(8, 0))
-        self.keyBox2.grid(padx=10, pady=10, ipady=5)
+        self.keyBox2.grid(padx=10, pady=8, ipady=3)
         self.horizontalSeparator4.grid(sticky="we")
-        self.subFrame6.grid(sticky="w", padx=10, pady=10)
-        self.encryptButton.grid()
+        self.subFrame6.grid()
+        self.subtext3.grid(sticky="w", pady=(8, 0))
+        self.keyBox3.grid(padx=10, pady=8, ipady=3)
+        self.horizontalSeparator5.grid(sticky="we")
+        self.subFrame7.grid(sticky="w", padx=10, pady=10)
+        self.decryptButton.grid()
 
         self.statusFrame.grid(column=2, row=0, padx=50, sticky="ns")
-        self.subFrame7.grid(sticky="w")
-        self.title2.grid(padx=(16, 50), pady=16)
-        self.horizontalSeparator5.grid(sticky="we")
         self.subFrame8.grid(sticky="w")
+        self.title2.grid(padx=(16, 50), pady=16)
+        self.horizontalSeparator6.grid(sticky="we")
+        self.subFrame9.grid(sticky="w")
         self.status.grid(sticky="w", padx=10, pady=(5, 0))
+
+        """ Hover effects """
+
+        self.decryptButton.bind("<Enter>", lambda e: self.decryptButton.configure(
+            bg=ButtonStyle.DECRYPT2_BUTTON["activebackground"]))
+        self.decryptButton.bind("<Leave>", lambda e: self.decryptButton.configure(
+            bg=ButtonStyle.DECRYPT2_BUTTON["bg"]))
+        self.upload_fileButton.bind("<Enter>", lambda e: self.upload_fileButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["activebackground"]))
+        self.upload_fileButton.bind("<Leave>", lambda e: self.upload_fileButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["bg"]))
 
     def imageSection(self):
         def uploadImage():
@@ -2500,41 +2914,56 @@ class DecryptMenu(tk.Frame):
             self.errorMessage.set("")
 
             self.status.config(fg=Colours.STATUS_WAIT)
-            self.statusMessage.set("Awaiting key input")
+            self.statusMessage.set("Awaiting key input...")
 
-        def decryptImage():
+        def decryptImage(k):
+            try:
+                BLANK, (newFilepath, timeTaken) = multicrypt.decrypt(filename=self.filename, filepath=self.filepath,
+                    passKey=k, cipher=self.cipher, dataformat=self.dataFormat)
+            except Exception as ex:
+                self.decryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.ERROR)
+                self.statusMessage.set("Image decryption failed!")
+                print(ex)
+            else:
+                self.decryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.STATUS_OK)
+                sMessage = "Image decrypted successfully!\n\nFilepath: {}\n\nTime taken: {:.2f}s"
+                self.statusMessage.set(sMessage.format(newFilepath, timeTaken))
+
+
+        def decryptImageController():
             self.error.grid(sticky="w", pady=(5, 0))
-            self.status.config(fg=Colours.STATUS_ERROR)
+            self.status.config(fg=Colours.ERROR)
+
             k = self.keyBox.get()
 
+            """ Input validation """
+
             if self.filepath is None:
-                self.errorMessage.set("No file uploaded.")
+                self.errorMessage.set("No image uploaded.")
                 self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
                 return None
 
-            if k == "":
+            elif k == "":
                 self.errorMessage.set("The key field is empty.")
                 self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
                 return None
 
-            if len(k) < 8:
+            elif len(k) < 8:
                 self.errorMessage.set("The key must be at least 8 characters long.")
                 self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
                 return None
 
-            self.error.grid_forget()
-            self.errorMessage.set("")
-
-            try:
-                BLANK, newFilepath = multicrypt.decrypt(filename=self.filename, filepath=self.filepath,
-                    passKey=k, cipher=self.cipher, dataformat=self.dataFormat)
-            except Exception as ex:
-                self.statusMessage.set("Image decryption failed!")
-                self.status.config(fg=Colours.STATUS_ERROR)
-                print(ex)
             else:
-                self.statusMessage.set("Image decrypted successfully!\n\nFilepath: {}".format(newFilepath))
-                self.status.config(fg=Colours.STATUS_OK)
+                self.error.grid_forget()
+                self.errorMessage.set("")
+                self.status.config(fg=Colours.STATUS_WAIT)
+                self.statusMessage.set("Decrypting image...")
+                self.decryptButton.configure(state="disabled", cursor="X_cursor")
+
+                # Allows the application to load the above before starting the decryption
+                threading.Timer(1, decryptImage, args=[k]).start()
 
         self.filepath = None
         self.filename = None
@@ -2596,17 +3025,17 @@ class DecryptMenu(tk.Frame):
         self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
-        self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
+        self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
-        self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
+        self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.encryptButton = tk.Button(self.subFrame5, text="Decrypt", command=lambda: decryptImage(),
-            **ButtonStyle.ENCRYPT2_BUTTON)
+        self.decryptButton = tk.Button(self.subFrame5, text="Decrypt", command=lambda: decryptImageController(),
+            **ButtonStyle.DECRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame5, textvariable=self.errorMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
 
@@ -2619,6 +3048,8 @@ class DecryptMenu(tk.Frame):
         self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
         self.status = tk.Label(self.subFrame8, textvariable=self.statusMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+
+        """Widget placment"""
 
         self.inputFrame.grid(padx=50, sticky="ns")
         self.subFrame.grid(sticky="w")
@@ -2633,7 +3064,7 @@ class DecryptMenu(tk.Frame):
         self.keyBox.grid(padx=10, pady=10, ipady=5)
         self.horizontalSeparator3.grid(sticky="we")
         self.subFrame5.grid(sticky="w", padx=10, pady=10)
-        self.encryptButton.grid()
+        self.decryptButton.grid()
 
         self.statusFrame.grid(column=2, row=0, padx=50, sticky="ns")
         self.subFrame7.grid(sticky="w")
@@ -2641,6 +3072,17 @@ class DecryptMenu(tk.Frame):
         self.horizontalSeparator5.grid(sticky="we")
         self.subFrame8.grid(sticky="w")
         self.status.grid(sticky="w", padx=10, pady=(5, 0))
+
+        """ Hover effects """
+
+        self.decryptButton.bind("<Enter>", lambda e: self.decryptButton.configure(
+            bg=ButtonStyle.DECRYPT2_BUTTON["activebackground"]))
+        self.decryptButton.bind("<Leave>", lambda e: self.decryptButton.configure(
+            bg=ButtonStyle.DECRYPT2_BUTTON["bg"]))
+        self.upload_imageButton.bind("<Enter>", lambda e: self.upload_imageButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["activebackground"]))
+        self.upload_imageButton.bind("<Leave>", lambda e: self.upload_imageButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["bg"]))
 
     def imageSectionForTripleDES(self):
         def uploadImage():
@@ -2660,56 +3102,78 @@ class DecryptMenu(tk.Frame):
             self.errorMessage.set("")
 
             self.status.config(fg=Colours.STATUS_WAIT)
-            self.statusMessage.set("Awaiting key input")
+            self.statusMessage.set("Awaiting key inputs...")
 
-        def decryptImage():
-            self.error.grid(sticky="w", pady=(5, 0))
-            self.status.config(fg=Colours.STATUS_ERROR)
-            k = self.keyBox.get()
-            k2 = self.keyBox2.get()
-
-            if self.filepath is None:
-                self.errorMessage.set("No file uploaded.")
-                self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
-                return None
-
-            if k == "":
-                self.errorMessage.set("The key field is empty.")
-                self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
-                return None
-
-            if len(k) < 8:
-                self.errorMessage.set("The key must be at least 8 characters long.")
-                self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
-                return None
-
-            if k2 == "":
-                self.errorMessage.set("The key field is empty.")
-                self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
-                return None
-
-            if len(k2) < 8:
-                self.errorMessage.set("The key must be at least 8 characters long.")
-                self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
-                return None
-
-            self.error.grid_forget()
-            self.errorMessage.set("")
-
-            start = time.time()
+        def decryptImage(k, k2, k3):
             try:
-                BLANK, newFilepath = multicrypt.decrypt(filename=self.filename, filepath=self.filepath,
-                    passKey=(k, k2), cipher=self.cipher, dataformat=self.dataFormat)
+                BLANK, (newFilepath, timeTaken) = multicrypt.decrypt(filename=self.filename, filepath=self.filepath,
+                    passKey=(k, k2, k3), cipher=self.cipher, dataformat=self.dataFormat)
             except Exception as ex:
+                self.decryptButton.configure(state="normal", cursor="hand2")
+                self.status.config(fg=Colours.ERROR)
                 self.statusMessage.set("Image decryption failed!")
-                self.status.config(fg=Colours.STATUS_ERROR)
                 print(ex)
             else:
-                self.statusMessage.set("Image decrypted successfully!\n\nFilepath: {}".format(newFilepath))
+                self.decryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.STATUS_OK)
+                sMessage = "Image decrypted successfully!\n\nFilepath: {}\n\nTime taken: {:.2f}s"
+                self.statusMessage.set(sMessage.format(newFilepath, timeTaken))
 
-            end = time.time()
-            print(end - start)
+
+        def decryptImageController():
+            self.error.grid(sticky="w", pady=(5, 0))
+            self.status.config(fg=Colours.ERROR)
+
+            k = self.keyBox.get()
+            k2 = self.keyBox2.get()
+            k3 = self.keyBox3.get()
+
+            """ Input validation """
+
+            if self.filepath is None:
+                self.errorMessage.set("No image uploaded.")
+                self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
+                return None
+
+            elif k == "":
+                self.errorMessage.set("The first key field is empty.")
+                self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
+                return None
+
+            elif len(k) < 8:
+                self.errorMessage.set("The first key must be at least 8 characters long.")
+                self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
+                return None
+
+            elif k2 == "":
+                self.errorMessage.set("The second key field is empty.")
+                self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
+                return None
+
+            elif len(k2) < 8:
+                self.errorMessage.set("The second key must be at least 8 characters long.")
+                self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
+                return None
+
+            elif k3 == "":
+                self.errorMessage.set("The third key field is empty.")
+                self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
+                return None
+
+            elif len(k3) < 8:
+                self.errorMessage.set("The third key must be at least 8 characters long.")
+                self.statusMessage.set("Image decryption failed!\nCheck ERROR message.")
+                return None
+
+            else:
+                self.error.grid_forget()
+                self.errorMessage.set("")
+                self.status.config(fg=Colours.STATUS_WAIT)
+                self.statusMessage.set("Decrypting image...")
+                self.decryptButton.configure(state="disabled", cursor="X_cursor")
+
+                # Allows the application to load the above before starting the decryption
+                threading.Timer(1, decryptImage, args=[k, k2, k3]).start()
 
         self.filepath = None
         self.filename = None
@@ -2771,33 +3235,49 @@ class DecryptMenu(tk.Frame):
         self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
+
+        # Key section 1
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+
+        # Key section 2
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
         self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox2 = tk.Entry(self.subFrame5, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
             highlightcolor="orange", highlightbackground="grey")
+
+        # Key section 3
         self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.encryptButton = tk.Button(self.subFrame6, text="Decrypt", command=lambda: decryptImage(),
-            **ButtonStyle.ENCRYPT2_BUTTON)
-        self.error = tk.Label(self.subFrame6, textvariable=self.errorMessage, wraplength=200, justify="left",
+        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+            font=Fonts.TITLE2)
+        self.keyBox3 = tk.Entry(self.subFrame6, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
+            highlightcolor="orange", highlightbackground="grey")
+
+        self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
+        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.decryptButton = tk.Button(self.subFrame7, text="Decrypt", command=lambda: decryptImageController(),
+            **ButtonStyle.DECRYPT2_BUTTON)
+        self.error = tk.Label(self.subFrame7, textvariable=self.errorMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Status frame section"""
 
         self.statusFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame7 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame7, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
-        self.horizontalSeparator5 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
         self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.status = tk.Label(self.subFrame8, textvariable=self.statusMessage, wraplength=200, justify="left",
+        self.title2 = tk.Label(self.subFrame8, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.horizontalSeparator6 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
+        self.subFrame9 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
+        self.status = tk.Label(self.subFrame9, textvariable=self.statusMessage, wraplength=200, justify="left",
             bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+
+        """Widget placment"""
 
         self.inputFrame.grid(padx=50, sticky="ns")
         self.subFrame.grid(sticky="w")
@@ -2809,21 +3289,36 @@ class DecryptMenu(tk.Frame):
         self.horizontalSeparator2.grid(sticky="we")
         self.subFrame4.grid()
         self.subtext.grid(sticky="w", pady=(8, 0))
-        self.keyBox.grid(padx=10, pady=10, ipady=5)
+        self.keyBox.grid(padx=10, pady=8, ipady=3)
         self.horizontalSeparator3.grid(sticky="we")
         self.subFrame5.grid()
         self.subtext2.grid(sticky="w", pady=(8, 0))
-        self.keyBox2.grid(padx=10, pady=10, ipady=5)
+        self.keyBox2.grid(padx=10, pady=8, ipady=3)
         self.horizontalSeparator4.grid(sticky="we")
-        self.subFrame6.grid(sticky="w", padx=10, pady=10)
-        self.encryptButton.grid()
+        self.subFrame6.grid()
+        self.subtext3.grid(sticky="w", pady=(8, 0))
+        self.keyBox3.grid(padx=10, pady=8, ipady=3)
+        self.horizontalSeparator5.grid(sticky="we")
+        self.subFrame7.grid(sticky="w", padx=10, pady=10)
+        self.decryptButton.grid()
 
         self.statusFrame.grid(column=2, row=0, padx=50, sticky="ns")
-        self.subFrame7.grid(sticky="w")
-        self.title2.grid(padx=(16, 50), pady=16)
-        self.horizontalSeparator5.grid(sticky="we")
         self.subFrame8.grid(sticky="w")
+        self.title2.grid(padx=(16, 50), pady=16)
+        self.horizontalSeparator6.grid(sticky="we")
+        self.subFrame9.grid(sticky="w")
         self.status.grid(sticky="w", padx=10, pady=(5, 0))
+
+        """ Hover effects """
+
+        self.decryptButton.bind("<Enter>", lambda e: self.decryptButton.configure(
+            bg=ButtonStyle.DECRYPT2_BUTTON["activebackground"]))
+        self.decryptButton.bind("<Leave>", lambda e: self.decryptButton.configure(
+            bg=ButtonStyle.DECRYPT2_BUTTON["bg"]))
+        self.upload_imageButton.bind("<Enter>", lambda e: self.upload_imageButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["activebackground"]))
+        self.upload_imageButton.bind("<Leave>", lambda e: self.upload_imageButton.configure(
+            bg=ButtonStyle.UPLOAD_BUTTON["bg"]))
 
 
 if __name__ == "__main__":
