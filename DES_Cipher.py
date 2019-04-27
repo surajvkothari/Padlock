@@ -15,8 +15,6 @@ import base64
 import os
 import time
 
-guide_data = {}
-
 
 def getShiftValuesForImage(passKey):
     """ Returns a list of denary values converted from their binary representation of the sub-keys """
@@ -105,18 +103,11 @@ def generateSubKeys(key):
     # Converts the hexed key into binary
     binaryKey = getBinaryKey(key=key)
 
-    guide_data["kb"] = hex(int(binaryKey, 2))[2:]
-
     # Permutates the binary key with PC1
     permutedBinaryKey = permutateBinaryKey_PC1(key=binaryKey)
 
-    guide_data["k_PC1_p"] = hex(int(permutedBinaryKey, 2))[2:]
-
     # Splits the permuted binary key into two halves
     leftHalf, rightHalf = splitPermutedKey(key=permutedBinaryKey)
-
-    guide_data["k_C"] = hex(int(leftHalf, 2))[2:]
-    guide_data["k_D"] = hex(int(rightHalf, 2))[2:]
 
     # Gets the 16 sub-keys as a list
     subKeys = getSubKeys(c=leftHalf, d=rightHalf)
@@ -191,18 +182,11 @@ def getSubKeys(c, d):
     cPrev = c
     dPrev = d
 
-    count = 1
-
     # Iterates over the given shift values
     for s in shifts:
         # Shifts the previous sub-keys by the shift value
         cNext = shiftItems(key=cPrev, shift=s)
         dNext = shiftItems(key=dPrev, shift=s)
-
-        if count <= 5:
-            guide_data["ks_C" + str(count)] = hex(int(cNext, 2))[2:]
-            guide_data["ks_D" + str(count)] = hex(int(dNext, 2))[2:]
-            count += 1
 
         # Changes the previous sub-keys to the current ones
         cPrev = cNext
@@ -243,8 +227,6 @@ def permutateSubKeys(keys):
     # Fetches the PC2-Block from the encryption blocks module
     PC_2 = encryptionBlocks.getPC_2()
 
-    count = 1
-
     # Iterates over each key from the 16 round keys
     for key in roundkeys:
         # Creates a list of each bit from the key
@@ -268,10 +250,6 @@ def permutateSubKeys(keys):
         binaryString = "".join(map(str, permutedSubKey))
 
         setOfSubKeys.append(binaryString)
-
-        if count <= 5:
-            guide_data["PC2_k" + str(count)] = hex(int(binaryString, 2))[2:]
-            count += 1
 
     return setOfSubKeys
 
@@ -385,11 +363,6 @@ def encodeIteration(l, r, subKeys):
 
     cipherText = hex(int(permuted, 2))[2:].zfill(16)
 
-    guide_data["L_block"] = hex(int(lNext, 2))[2:]
-    guide_data["R_block"] = hex(int(rNext, 2))[2:]
-    guide_data["RL_block"] = hex(int(reversedBinary, 2))[2:]
-    guide_data["RL_IP1"] = hex(int(permuted, 2))[2:]
-
     return cipherText
 
 
@@ -458,12 +431,8 @@ def functionF(rightHalf, key):
     # Converts the function E's return to denary
     E = int(functionE(rightHalf=rightHalf), 2)
 
-    guide_data["E_b"] = hex(E)[2:]
-
     # Calculates the XOR addition of the key and E function
     xorAddition = bin(key ^ E)
-
-    guide_data["XOR_b"] = hex(int(xorAddition, 2))[2:]
 
     # Formats the calculated binary value into a 48bit string
     xorAddition = xorAddition[2:].zfill(48)
@@ -473,25 +442,15 @@ def functionF(rightHalf, key):
 
     S_String = ""
 
-    count = 1
-
     # Enumerates over the binary blocks
     for i, block in enumerate(blocks):
         # Gets a 4bit subblock from function S
         subBlock = functionS(block=block, blockIndex=i)
 
-        guide_data["11_I" + str(count)] = block
-        guide_data["11_O" + str(count)] = subBlock
-
         S_String += subBlock
 
-        count += 1
-
-    guide_data["S_string"] = hex(int(S_String, 2))[2:]
     # Permutates the S_String with P
     permutatedS_String = permutateS_String(S_String)
-
-    guide_data["S_string_p"] = hex(int(permutatedS_String, 2))[2:]
 
     return permutatedS_String
 
@@ -582,11 +541,6 @@ def permutate_IP_1(binary):
 def encryptMessage(plaintext, passKey, isTripleDES=None):
     """ Takes in a plaintext and passkey and returns the ciphertext using DES """
 
-    if isTripleDES is not True:
-        guide_data['fc'] = 'Encryption'
-        guide_data['txt'] = plaintext
-        guide_data['key'] = passKey
-
     if isTripleDES is True:
         hexedPlainText = plaintext
 
@@ -604,8 +558,6 @@ def encryptMessage(plaintext, passKey, isTripleDES=None):
 
     # Iterates over each block of 16 hex chars in the hexed plaintext
 
-    toggle = 0
-
     for hexBlock in hexedPlainText:
         # Converts each hex block to binary
         binaryPlainText = getBinaryMessage(message=hexBlock)
@@ -622,24 +574,11 @@ def encryptMessage(plaintext, passKey, isTripleDES=None):
         # Concatenate the ciphertext parts of each hex block to form the main ciphertext
         cipherText += cipherPart
 
-        if toggle == 0:
-            guide_data['t_b'] = hex(int(binaryPlainText, 2))[2:]
-            guide_data['t_IP'] = hex(int(permutedBinaryPlainText, 2))[2:]
-            guide_data['t_IP_L'] = hex(int(leftHalf, 2))[2:]
-            guide_data['t_IP_R'] = hex(int(rightHalf, 2))[2:]
-            guide_data['f_txt'] = cipherText
-            toggle = 1
-
-    return guide_data, cipherText
+    return cipherText
 
 
 def decryptMessage(ciphertext, passKey, isTripleDES=None):
     """ Takes in a ciphertext and passkey and returns the plaintext using DES """
-
-    if isTripleDES is not True:
-        guide_data['fc'] = 'Decryption'
-        guide_data['txt'] = ciphertext
-        guide_data['key'] = passKey
 
     # Converts the passkey into a hex string
     hexedKey = getHexedKey(key=passKey)
@@ -651,8 +590,6 @@ def decryptMessage(ciphertext, passKey, isTripleDES=None):
     cipherText = [ciphertext[i:i+16] for i in range(0, len(ciphertext), 16)]
 
     plainText = ""
-
-    toggle = 0
 
     # Iterates over each block of 16 hex chars in the hexed ciphertext
     for hexBlock in cipherText:
@@ -691,14 +628,6 @@ def decryptMessage(ciphertext, passKey, isTripleDES=None):
             # Joins the characters in the list of ASCII characters
             decryptedPart = "".join(decryptedPart)
 
-            if toggle == 0:
-                guide_data['t_b'] = hex(int(binaryCipherText, 2))[2:]
-                guide_data['t_IP'] = hex(int(permutedBinaryCipherText, 2))[2:]
-                guide_data['IP_L'] = hex(int(leftHalfMessage, 2))[2:]
-                guide_data['IP_R'] = hex(int(rightHalfMessage, 2))[2:]
-                guide_data['f_txt'] = decryptedPart
-                toggle = 1
-
         # Concatenates the decrypted parts of each hex block to form the main plaintext
         plainText += decryptedPart
 
@@ -708,10 +637,10 @@ def decryptMessage(ciphertext, passKey, isTripleDES=None):
     """
 
     if isTripleDES is True:
-        return guide_data, [plainText[i:i+16] for i in range(0, len(plainText), 16)]
+        return [plainText[i:i+16] for i in range(0, len(plainText), 16)]
 
     else:
-        return guide_data, plainText
+        return plainText
 
 
 def encrypt_tripleDES(plaintext, passKey):
@@ -727,18 +656,9 @@ def encrypt_tripleDES(plaintext, passKey):
     from the decryption process.
     """
 
-    guide_data_T, encryptedData1 = encryptMessage(plaintext=plaintext, passKey=key1)
-    BLANK, encryptedData2 = decryptMessage(ciphertext=encryptedData1, passKey=key2, isTripleDES=True)
-    BLANK, encryptedData = encryptMessage(plaintext=encryptedData2, passKey=key3, isTripleDES=True)
-
-    guide_data_T['fc'] = 'Encryption'
-    guide_data_T['txt'] = plaintext
-    guide_data_T['key1'] = key1
-    guide_data_T['key2'] = key2
-    guide_data_T['key3'] = key3
-    guide_data_T['f_txt'] = encryptedData
-
-    guide_data = guide_data_T
+    encryptedData1 = encryptMessage(plaintext=plaintext, passKey=key1)
+    encryptedData2 = decryptMessage(ciphertext=encryptedData1, passKey=key2, isTripleDES=True)
+    encryptedData = encryptMessage(plaintext=encryptedData2, passKey=key3, isTripleDES=True)
 
     return encryptedData
 
@@ -750,24 +670,15 @@ def decrypt_tripleDES(ciphertext, passKey):
     key2 = passKey[1]
     key3 = passKey[2]
 
-    guide_data_T, decryptedData1 = decryptMessage(ciphertext=ciphertext, passKey=key3, isTripleDES=True)
-    BLANK, decryptedData2 = encryptMessage(plaintext=decryptedData1, passKey=key2, isTripleDES=True)
+    decryptedData1 = decryptMessage(ciphertext=ciphertext, passKey=key3, isTripleDES=True)
+    decryptedData2 = encryptMessage(plaintext=decryptedData1, passKey=key2, isTripleDES=True)
 
     """
     For the last decryption, there is no need to pass the optional argument of isTripleDES,
     as the DES algorithm has to convert the plaintext to ASCII characters
     """
 
-    BLANK, decryptedData = decryptMessage(ciphertext=decryptedData2, passKey=key1)
-
-    guide_data_T['fc'] = 'Decryption'
-    guide_data_T['txt'] = ciphertext
-    guide_data_T['key1'] = key1
-    guide_data_T['key2'] = key2
-    guide_data_T['key3'] = key3
-    guide_data_T['f_txt'] = decryptedData
-
-    guide_data = guide_data_T
+    decryptedData = decryptMessage(ciphertext=decryptedData2, passKey=key1)
 
     return decryptedData
 
@@ -796,7 +707,7 @@ def encryptFile(filename, filepath, passKey, isTripleDES=None):
                     E = encrypt_tripleDES(plaintext=L, passKey=passKey)
 
                 else:
-                    BLANK, E = encryptMessage(plaintext=L, passKey=passKey, isTripleDES=isTripleDES)
+                    E = encryptMessage(plaintext=L, passKey=passKey, isTripleDES=isTripleDES)
             else:
                 E = "\n"
 
@@ -839,7 +750,7 @@ def encryptFileBase64(filename, filepath, passKey, isTripleDES=None):
         Encrypted = encrypt_tripleDES(plaintext=encoded, passKey=passKey)
 
     else:
-        BLANK, Encrypted = encryptMessage(plaintext=encoded, passKey=passKey, isTripleDES=isTripleDES)
+        Encrypted = encryptMessage(plaintext=encoded, passKey=passKey, isTripleDES=isTripleDES)
 
     extension = os.path.splitext(filename)[1]
     eLength = len(extension)
@@ -884,7 +795,7 @@ def decryptFile(filename, filepath, passKey, isTripleDES=None):
                     D = decrypt_tripleDES(ciphertext=L, passKey=passKey)
 
                 else:
-                    BLANK, D = decryptMessage(ciphertext=L, passKey=passKey)
+                    D = decryptMessage(ciphertext=L, passKey=passKey)
             else:
                 D = "\n"
 
@@ -925,7 +836,7 @@ def decryptFileBase64(filename, filepath, passKey, isTripleDES=None):
         Decrypted = decrypt_tripleDES(ciphertext=content, passKey=passKey)
 
     else:
-        BLANK, Decrypted = decryptMessage(ciphertext=content, passKey=passKey)
+        Decrypted = decryptMessage(ciphertext=content, passKey=passKey)
 
     if "ENC" in filename:
         newFilename = "{}/{}".format(filepath, filename.replace("ENC", "DEC"))
@@ -999,7 +910,7 @@ def encryptCheck(passKey, dataformat, cipherMode=None, plaintext=None, filename=
             encryptedData = encrypt_tripleDES(plaintext=plaintext, passKey=passKey)
 
         else:
-            BLANK, encryptedData = encryptMessage(plaintext=plaintext, passKey=passKey, isTripleDES=isTripleDES)
+            encryptedData = encryptMessage(plaintext=plaintext, passKey=passKey, isTripleDES=isTripleDES)
 
         timeTaken = 0
 
@@ -1039,7 +950,7 @@ def decryptCheck(passKey, dataformat, cipherMode=None, ciphertext=None, filename
             decryptedData = decrypt_tripleDES(ciphertext=ciphertext, passKey=passKey)
 
         else:
-            BLANK, decryptedData = decryptMessage(ciphertext=ciphertext, passKey=passKey, isTripleDES=isTripleDES)
+            decryptedData = decryptMessage(ciphertext=ciphertext, passKey=passKey, isTripleDES=isTripleDES)
 
         timeTaken = 0
 
@@ -1072,10 +983,10 @@ def decryptCheck(passKey, dataformat, cipherMode=None, ciphertext=None, filename
 
 
 def encrypt(passKey, dataformat, cipherMode=None, plaintext=None, filename=None, filepath=None, isTripleDES=None):
-    return guide_data, encryptCheck(passKey, dataformat, cipherMode=cipherMode, plaintext=plaintext, filename=filename, filepath=filepath,
+    return encryptCheck(passKey, dataformat, cipherMode=cipherMode, plaintext=plaintext, filename=filename, filepath=filepath,
         isTripleDES=isTripleDES)
 
 
 def decrypt(passKey, dataformat, cipherMode=None, ciphertext=None, filename=None, filepath=None, isTripleDES=None):
-    return guide_data, decryptCheck(passKey, dataformat, cipherMode=cipherMode, ciphertext=ciphertext, filename=filename, filepath=filepath,
+    return decryptCheck(passKey, dataformat, cipherMode=cipherMode, ciphertext=ciphertext, filename=filename, filepath=filepath,
         isTripleDES=isTripleDES)

@@ -16,8 +16,6 @@ import itertools
 import os
 import time
 
-guide_data = {}
-
 
 def getShiftKeyForImage(passKey):
     """ Returns a list of binary values converted from their hexed representation of the round keys """
@@ -526,7 +524,7 @@ def encryptMessage(plaintext, passKey):
 
         cipherTextFinal += cipherText
 
-    return guide_data, cipherTextFinal.upper()
+    return cipherTextFinal.upper()
 
 
 def decryptMessage(ciphertext, passKey):
@@ -608,7 +606,7 @@ def decryptMessage(ciphertext, passKey):
         # Converts plaintext in hex to ASCII string
         plainTextFinal += getPlainTextFromHex(plainText)
 
-    return guide_data, plainTextFinal
+    return plainTextFinal
 
 
 def encryptFile(filename, filepath, passKey):
@@ -754,7 +752,7 @@ def encryptCheck(passKey, dataformat, cipherMode=None, plaintext=None, filename=
     """ Organises how the different dataformats are encrypted """
 
     if dataformat == "Messages":
-        BLANK, encryptedData = encryptMessage(plaintext=plaintext, passKey=passKey)
+        encryptedData = encryptMessage(plaintext=plaintext, passKey=passKey)
         timeTaken = 0
 
     elif dataformat == "Files":
@@ -789,7 +787,7 @@ def decryptCheck(passKey, dataformat, cipherMode=None, ciphertext=None, filename
     """ Organises how the different dataformats are decrypted """
 
     if dataformat == "Messages":
-        BLANK, decryptedData = decryptMessage(ciphertext=ciphertext, passKey=passKey)
+        decryptedData = decryptMessage(ciphertext=ciphertext, passKey=passKey)
         timeTaken = 0
 
     elif dataformat == "Files":
@@ -822,10 +820,10 @@ def decryptCheck(passKey, dataformat, cipherMode=None, ciphertext=None, filename
 
 
 def encrypt(passKey, dataformat, cipherMode=None, plaintext=None, filename=None, filepath=None):
-    return guide_data, encryptCheck(passKey, dataformat, cipherMode=cipherMode, plaintext=plaintext,
+    return encryptCheck(passKey, dataformat, cipherMode=cipherMode, plaintext=plaintext,
         filename=filename, filepath=filepath)
 
 
 def decrypt(passKey, dataformat, cipherMode=None, ciphertext=None, filename=None, filepath=None):
-    return guide_data, decryptCheck(passKey, dataformat, cipherMode=cipherMode, ciphertext=ciphertext,
+    return decryptCheck(passKey, dataformat, cipherMode=cipherMode, ciphertext=ciphertext,
         filename=filename, filepath=filepath)
