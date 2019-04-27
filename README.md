@@ -1,10 +1,8 @@
 # Padlock Encryption Software
 
-Padlock is a 3 in 1 encryption software that aims to teach students cryptography through a wonderful designed GUI that gives access to a number of standard encryption methods.
+Padlock is a 3 in 1 encryption software that has a wonderful designed GUI which gives access to a number of standard encryption ciphers.
 
-It teaches students ciphers with three different levels of security, from Caesar Cipher to DES Cipher. Not only does the software allow the students to encrypt and decrypt their messages, it also allows them to visualise the strength of the ciphers through image encryption and decryption! The software also has support for file encyption/decryption as well.
-
-Moreover, there is a helpful online guide that changes its content dynamically to explain the background process of each cipher using the user's chosen text and key.
+Padlock ranges from Caesar Cipher to AES Cipher. Not only does the software allow the students to encrypt and decrypt their messages. The software also has support for files and images encyption/decryption as well.
 
 ## Getting Started
 
@@ -52,6 +50,7 @@ pip install Pillow
 * Cryptii - *https://cryptii.com/*
 * Tkinter reference - *https://effbot.org/tkinterbook/*
 * DES Walkthrough - *http://page.math.tu-berlin.de/~kant/teaching/hess/krypto-ws2006/des.htm*
-
+* AES Walkthrough - *https://kavaliro.com/wp-content/uploads/2014/03/AES.pdf*
+* RC4 Walkthrough - *https://sites.math.washington.edu/~nichifor/310_2008_Spring/Pres_RC4%20Encryption.pdf*
 
 
