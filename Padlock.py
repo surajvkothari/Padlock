@@ -15,8 +15,6 @@ import tkinter as tk
 import tkinter.ttk
 import tkinter.filedialog
 import os
-import urllib
-import webbrowser
 import time
 import threading
 from styles import *
@@ -44,7 +42,7 @@ class Padlock(tk.Tk):
         top.rowconfigure(0, weight=1)
         top.rowconfigure(1, weight=1)
 
-        self.configure(background="white")
+        self.configure(background=Colours.WHITE)
 
         """Creates a footer"""
 
@@ -53,7 +51,7 @@ class Padlock(tk.Tk):
 Created by: Suraj Kothari. For A-level Computer Science at Woodhouse College."
 
         copyrightText = tk.Label(footer, text=self.copyrightMessage,
-            bg=Colours.FOOTER, fg="white", font=Fonts.SMALL_PRINT)
+            bg=Colours.FOOTER, fg=Colours.WHITE, font=Fonts.SMALL_PRINT)
 
         footer.grid(row=2, sticky="ew")
         copyrightText.grid()
@@ -62,7 +60,7 @@ Created by: Suraj Kothari. For A-level Computer Science at Woodhouse College."
 
         # Sets the current frame to the home page
         self.switch_frame(HomePage)
-        #self.switch_frame(EncryptMenu, process="Encrypt", dataFormat="Images", cipher="AES Cipher")
+        # self.switch_frame(EncryptMenu, process="Encrypt", dataFormat="Messages", cipher="RC4 Cipher")
 
     def switch_frame(self, frame_class, process=None, dataFormat=None, cipher=None, cipherMode=None):
         """Destroys current frame and replaces it with a new one."""
@@ -90,7 +88,7 @@ class HomePage(tk.Frame):
     def __init__(self, master, process, dataFormat, cipher, cipherMode):
         tk.Frame.__init__(self, master)
 
-        self.configure(background=Colours.BACKGROUND)
+        self.configure(background=Colours.WHITE)
 
         # Initialises the icons used for this frame
         self.icon = Image.open("Images/encryptIcon.png")
@@ -114,7 +112,7 @@ class HomePage(tk.Frame):
         self.header = tk.Frame(self.master, bg=Colours.MAIN)
         self.Logo = tk.Label(self.header, text="Padlock", bg=Colours.MAIN,
             fg=Colours.LOGO, font=Fonts.LOGO)
-        self.homeTag = tk.Label(self.header, text="Home", bg=Colours.BACKGROUND,
+        self.homeTag = tk.Label(self.header, text="Home", bg=Colours.WHITE,
             fg=Colours.FOREGROUND, font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -166,7 +164,7 @@ class FormatSelctionMenu(tk.Frame):
         self.FILE_ICON = ImageTk.PhotoImage(self.icon2)
         self.IMAGE_ICON = ImageTk.PhotoImage(self.icon3)
 
-        self.configure(background=Colours.BACKGROUND)
+        self.configure(background=Colours.WHITE)
 
         self.createWidgets()
 
@@ -185,7 +183,7 @@ class FormatSelctionMenu(tk.Frame):
         self.homeTag = tk.Label(self.header, text="Home", bg=Colours.MAIN,
             fg=Colours.TAGS_NOT_ACTIVE, font=Fonts.TAGS, cursor="hand2")
         self.sectionTag = tk.Label(self.header, text=self.process,
-            bg=Colours.BACKGROUND, fg=Colours.FOREGROUND, font=Fonts.TAGS)
+            bg=Colours.WHITE, fg=Colours.FOREGROUND, font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
         self.Logo.grid(padx=20, pady=20)
@@ -241,7 +239,7 @@ class CipherMenu(tk.Frame):
         self.process = process
         self.dataFormat = dataFormat
 
-        self.configure(background=Colours.BACKGROUND)
+        self.configure(background=Colours.WHITE)
 
         self.createWidgets()
 
@@ -260,7 +258,7 @@ class CipherMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag = tk.Label(self.header, text=self.process, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag2 = tk.Label(self.header, text=self.dataFormat, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag2 = tk.Label(self.header, text=self.dataFormat, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -310,6 +308,11 @@ class CipherMenu(tk.Frame):
             self.AES_Button = tk.Button(self, text="AES",
                 command=lambda: self.master.switch_frame(CipherModeMenu, process=self.process,
                     dataFormat=self.dataFormat, cipher="AES Cipher"), **ButtonStyle.AES_BUTTON)
+
+            self.RC4_Button = tk.Button(self, text="RC4",
+                command=lambda: self.master.switch_frame(CipherModeMenu, process=self.process,
+                    dataFormat=self.dataFormat, cipher="RC4 Cipher"), **ButtonStyle.RC4_BUTTON)
+
         else:
             self.DES_Button = tk.Button(self, text="DES",
                 command=lambda: self.master.switch_frame(EncryptMenu, process=self.process,
@@ -332,16 +335,23 @@ class CipherMenu(tk.Frame):
                             self.master.switch_frame(DecryptMenu, process=self.process,
                                 dataFormat=self.dataFormat, cipher="AES Cipher"), **ButtonStyle.AES_BUTTON)
 
+            self.RC4_Button = tk.Button(self, text="RC4",
+                command=lambda: self.master.switch_frame(EncryptMenu, process=self.process,
+                    dataFormat=self.dataFormat, cipher="RC4 Cipher")
+                        if self.process == "Encrypt" else \
+                            self.master.switch_frame(DecryptMenu, process=self.process,
+                                dataFormat=self.dataFormat, cipher="RC4 Cipher"), **ButtonStyle.RC4_BUTTON)
+
         self.verticalSeparator = tk.ttk.Separator(self, orient="vertical")
         self.verticalSeparator2 = tk.ttk.Separator(self, orient="vertical")
 
-        self.weakText = tk.Label(self, text="WEAK CIPHERS", bg=Colours.BACKGROUND,
+        self.weakText = tk.Label(self, text="WEAK CIPHERS", bg=Colours.WHITE,
             fg=Colours.INFO, font=Fonts.INFO)
 
-        self.medText = tk.Label(self, text="MEDIUM CIPHERS", bg=Colours.BACKGROUND,
+        self.medText = tk.Label(self, text="MEDIUM CIPHERS", bg=Colours.WHITE,
             fg=Colours.INFO, font=Fonts.INFO)
 
-        self.strongText = tk.Label(self, text="STRONG CIPHERS", bg=Colours.BACKGROUND,
+        self.strongText = tk.Label(self, text="STRONG CIPHERS", bg=Colours.WHITE,
             fg=Colours.INFO, font=Fonts.INFO)
 
         self.weakText.grid(row=0, column=0, padx=26, pady=(0, 5))
@@ -354,6 +364,7 @@ class CipherMenu(tk.Frame):
         self.verticalSeparator2.grid(column=3, row=1, rowspan=2, sticky="ns")
         self.strongText.grid(column=4, row=0, padx=26, pady=(0, 5))
         self.AES_Button.grid(column=4, row=1, padx=26, pady=(0, 10))
+        self.RC4_Button.grid(column=4, row=2, padx=26, pady=(10, 0))
 
         # Creates hover listeners for the buttons to change colour when hovered
         self.caesar_Button.bind("<Enter>", lambda e: self.caesar_Button.configure(
@@ -376,6 +387,10 @@ class CipherMenu(tk.Frame):
             bg=ButtonStyle.AES_BUTTON["activebackground"]))
         self.AES_Button.bind("<Leave>", lambda e: self.AES_Button.configure(
             bg=ButtonStyle.AES_BUTTON["bg"]))
+        self.RC4_Button.bind("<Enter>", lambda e: self.RC4_Button.configure(
+            bg=ButtonStyle.RC4_BUTTON["activebackground"]))
+        self.RC4_Button.bind("<Leave>", lambda e: self.RC4_Button.configure(
+            bg=ButtonStyle.RC4_BUTTON["bg"]))
 
 
 class CipherModeMenu(tk.Frame):
@@ -390,18 +405,36 @@ class CipherModeMenu(tk.Frame):
         self.cipher = cipher
         self.cipherMode = cipherMode
 
-        self.configure(background=Colours.BACKGROUND)
+        self.configure(background=Colours.WHITE)
 
         self.createWidgets()
 
     def createWidgets(self):
         self.master = self.winfo_toplevel()  # Gets the top level window
 
-        self.classic_text = "Uses the English Alphabet. This will NOT encrypt/decrypt ASCII characters, \
-such as punctuation and numbers. Use for text files."
-        self.classic_text2 = "Encrypts/decrypts just text files."
-        self.ascii_text = "This will encrypt/decrypt ASCII characters such as punctuation and numbers. Use for text files."
-        self.base64_text = "Uses Base64 to encode files before encrypting/decrypting them. Use for files of any type."
+        if self.process == "Encrypt":
+            self.placeholder = "encrypt"
+        else:
+            self.placeholder = "decrypt"
+
+        if self.dataFormat == "Messages":
+            self.classic_text = "Uses the English Alphabet. This will NOT " + self.placeholder + " ASCII characters, \
+such as punctuation and numbers."
+
+            self.ascii_text = "This will " + self.placeholder + " ASCII characters such as punctuation and numbers."
+
+        else:
+            self.classic_text = "Uses the English Alphabet. This will NOT " + self.placeholder + " ASCII characters, \
+such as punctuation and numbers. Use this mode just for text files."
+
+            self.classic_text2 = self.placeholder.title() + "s normally with the cipher. Use this mode for just text files."
+
+            self.ascii_text = "This will " + self.placeholder + " ASCII characters such as punctuation and numbers. \
+Use this mode just for text files."
+
+            self.base64_text = "Uses Base64 to encode files before " + self.placeholder + "ing them. \
+Use this mode for files of any type."
+
         """
         Creates a header:
         The header frame is placed in the main application (master frame),
@@ -416,7 +449,7 @@ such as punctuation and numbers. Use for text files."
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag2 = tk.Label(self.header, text=self.dataFormat, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag3 = tk.Label(self.header, text="Mode Select", bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag3 = tk.Label(self.header, text="Mode Select", bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -433,14 +466,14 @@ such as punctuation and numbers. Use for text files."
             dataFormat=self.dataFormat))
 
         # If chosen format is files and either DES or Triple DES is selected, create these widgets
-        if self.dataFormat == "Files" and self.cipher in ("DES Cipher", "Triple DES Cipher", "AES Cipher"):
+        if self.dataFormat == "Files" and self.cipher in ("DES Cipher", "Triple DES Cipher", "AES Cipher", "RC4 Cipher"):
             self.classicButton = tk.Button(self, text="Classic",
             command=lambda: self.master.switch_frame(EncryptMenu, process=self.process, dataFormat=self.dataFormat,
                 cipher=self.cipher, cipherMode="Classic")
                     if self.process == "Encrypt" else \
                         self.master.switch_frame(DecryptMenu, process=self.process,
                             dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="Classic"), **ButtonStyle.CLASSIC_BUTTON)
-            self.classicText = tk.Label(self, text=self.classic_text2, wraplength=220, bg=Colours.BACKGROUND,
+            self.classicText = tk.Label(self, text=self.classic_text2, wraplength=220, bg=Colours.WHITE,
                 fg=Colours.INFO, font=Fonts.INFO)
 
             self.verticalSeparator = tk.ttk.Separator(self, orient="vertical")
@@ -451,7 +484,7 @@ such as punctuation and numbers. Use for text files."
                     if self.process == "Encrypt" else \
                         self.master.switch_frame(DecryptMenu, process=self.process,
                             dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="Base64"), **ButtonStyle.BASE64_BUTTON)
-            self.Base64_Text = tk.Label(self, text=self.base64_text, bg=Colours.BACKGROUND,
+            self.Base64_Text = tk.Label(self, text=self.base64_text, bg=Colours.WHITE,
                 wraplength=220, fg=Colours.INFO, font=Fonts.INFO)
 
             self.classicButton.grid(padx=20)
@@ -469,6 +502,7 @@ such as punctuation and numbers. Use for text files."
                 bg=ButtonStyle.BASE64_BUTTON["activebackground"]))
             self.base64Button.bind("<Leave>", lambda e: self.base64Button.configure(
                 bg=ButtonStyle.BASE64_BUTTON["bg"]))
+
         else:
             self.classicButton = tk.Button(self, text="Classic",
             command=lambda: self.master.switch_frame(EncryptMenu, process=self.process, dataFormat=self.dataFormat,
@@ -476,7 +510,7 @@ such as punctuation and numbers. Use for text files."
                     if self.process == "Encrypt" else \
                         self.master.switch_frame(DecryptMenu, process=self.process,
                             dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="Classic"), **ButtonStyle.CLASSIC_BUTTON)
-            self.classicText = tk.Label(self, text=self.classic_text, wraplength=300, bg=Colours.BACKGROUND,
+            self.classicText = tk.Label(self, text=self.classic_text, wraplength=300, bg=Colours.WHITE,
                 fg=Colours.INFO, font=Fonts.INFO)
 
             self.verticalSeparator = tk.ttk.Separator(self, orient="vertical")
@@ -487,7 +521,7 @@ such as punctuation and numbers. Use for text files."
                     if self.process == "Encrypt" else \
                         self.master.switch_frame(DecryptMenu, process=self.process,
                             dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="ASCII"), **ButtonStyle.ASCII_BUTTON)
-            self.ASCII_Text = tk.Label(self, text=self.ascii_text, bg=Colours.BACKGROUND,
+            self.ASCII_Text = tk.Label(self, text=self.ascii_text, bg=Colours.WHITE,
                 wraplength=310, fg=Colours.INFO, font=Fonts.INFO)
 
             self.classicButton.grid(padx=20)
@@ -503,7 +537,7 @@ such as punctuation and numbers. Use for text files."
                         if self.process == "Encrypt" else \
                             self.master.switch_frame(DecryptMenu, process=self.process,
                                 dataFormat=self.dataFormat, cipher=self.cipher, cipherMode="Base64"), **ButtonStyle.BASE64_BUTTON)
-                self.Base64_Text = tk.Label(self, text=self.base64_text, bg=Colours.BACKGROUND,
+                self.Base64_Text = tk.Label(self, text=self.base64_text, bg=Colours.WHITE,
                     wraplength=220, fg=Colours.INFO, font=Fonts.INFO)
 
                 self.verticalSeparator2 = tk.ttk.Separator(self, orient="vertical")
@@ -558,18 +592,21 @@ class EncryptMenu(tk.Frame):
             # Triple DES requires a separate section
             if self.cipher == "Triple DES Cipher":
                 self.messageSectionForTripleDES()
+
             else:
                 self.messageSection()
 
         elif self.dataFormat == "Files":
             if self.cipher == "Triple DES Cipher":
                 self.fileSectionForTripleDES()
+
             else:
                 self.fileSection()
 
         elif self.dataFormat == "Images":
             if self.cipher == "Triple DES Cipher":
                 self.imageSectionForTripleDES()
+
             else:
                 self.imageSection()
 
@@ -592,71 +629,43 @@ class EncryptMenu(tk.Frame):
 
             if p == "":
                 self.errorMessage.set("The plaintext field is empty.")
-                self.guidelink.grid_forget()
                 return None
 
             if k == "":
                 self.errorMessage.set("The key field is empty.")
-                self.guidelink.grid_forget()
                 return None
 
             if len(k) < 8:
                 self.errorMessage.set("The key must be at least 8 characters long.")
-                self.guidelink.grid_forget()
                 return None
 
             # ONLY for Vigenere Cipher in CLASSIC mode
             if self.cipher == "Vigenere Cipher" and self.cipherMode == "Classic" and not(k.isalpha()):
                 self.errorMessage.set("The key must not contain any ASCII characters.")
-                self.guidelink.grid_forget()
                 return None
 
             self.error.grid_forget()  # Removes the error message
             self.errorMessage.set("")
 
-            self.guide_data, cipherText = multicrypt.encrypt(plaintext=p, passKey=k, cipher=self.cipher,
+            cipherText, timeTaken = multicrypt.encrypt(plaintext=p, passKey=k, cipher=self.cipher,
                 dataformat=self.dataFormat, cipherMode=self.cipherMode)
 
             self.outputBox.configure(state="normal", cursor="xterm")
             self.outputBox.insert("1.0", cipherText)
-            self.horizontalSeparatorGuide.grid(sticky="we")
-            self.guidelink.grid(sticky="w", pady=(5, 0))
 
         def copyInputToClipboard():
             i = self.inputBox.get()
             i = i.split("\n")[0]  # The new line character is ommited.
+
             self.master.clipboard_clear()
             self.master.clipboard_append(i)
 
         def copyOutputToClipboard():
             o = self.outputBox.get("1.0", "end")
             o = o.split("\n")[0]  # The new line character is ommited.
+
             self.master.clipboard_clear()
             self.master.clipboard_append(o)
-
-        def openguide():
-            # Converts guide data dictionary to url form
-            url_data = urllib.parse.urlencode(self.guide_data)
-
-            # Opens default windows browser. Without it, it opens IE.
-            if self.cipher == "Caesar Cipher":
-                if self.cipherMode == "ASCII":
-                    #url = r"https://alpha.prkl.tech/suraj-padlockserver/caesar/caesar.html?" + (url_data)
-                    url = r"http://localhost/padlock/caesar/caesar_ASCII.html?" + (url_data)
-                else:
-                    url = r"http://localhost/padlock/caesar/caesar_classic.html?" + (url_data)
-
-            elif self.cipher == "Vigenere Cipher":
-                if self.cipherMode == "ASCII":
-                    url = r"http://localhost/padlock/vigenere/vigenere_ASCII.html?" + (url_data)
-                else:
-                    url = r"http://localhost/padlock/vigenere/vigenere_classic.html?" + (url_data)
-
-            elif self.cipher == "DES Cipher":
-                #url = r"https://alpha.prkl.tech/suraj-padlockserver/DES/DES.html?" + (url_data)
-                url = r"http://localhost/padlock/DES/DES.html?" + (url_data)
-
-            webbrowser.get('windows-default').open_new(url)
 
         self.errorMessage = tk.StringVar()  # Text variable that stores the different error messages
 
@@ -678,7 +687,7 @@ class EncryptMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag3 = tk.Label(self.header, text=self.cipherMode, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -688,8 +697,9 @@ class EncryptMenu(tk.Frame):
         self.sectionTag2.grid(column=3, row=0, pady=(10, 0), padx=10)
 
         # DES cipher and AES cipher have no modes so this won't display the mode tag
-        if self.cipher in ("DES Cipher", "AES Cipher"):
+        if self.cipher in ("DES Cipher", "AES Cipher", "RC4 Cipher"):
             self.sectionTag4.grid(column=5, row=0, sticky="ns", ipadx=40, pady=(10, 0), padx=10)
+
         else:
             self.sectionTag3.grid(column=4, row=0, pady=(10, 0), padx=10)
             self.sectionTag4.grid(column=5, row=0, sticky="ns", ipadx=40, pady=(10, 0), padx=10)
@@ -704,56 +714,50 @@ class EncryptMenu(tk.Frame):
 
         """Input frame section"""
 
-        self.inputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
-        self.title = tk.Label(self.subFrame, text="Plaintext", bg=Colours.BACKGROUND, fg=Colours.TITLE_FG, font=Fonts.TITLE)
+        self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
+        self.title = tk.Label(self.subFrame, text="Plaintext", bg=Colours.WHITE, fg=Colours.TITLE_FG, font=Fonts.TITLE)
         self.copyButton = tk.Button(self.subFrame, text="Copy Plaintext", compound="left", image=self.COPY_ICON,
         command=lambda: copyInputToClipboard(), **ButtonStyle.COPY_BUTTON)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
-        self.subFrame2 = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
+        self.subFrame2 = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.inputBox = tk.Entry(self.subFrame2, width=24, font=Fonts.TEXT, relief="flat")
         self.inputScrollbar = tk.Scrollbar(self.subFrame2, orient="horizontal", command=self.inputBox.xview)
         self.inputBox['xscrollcommand'] = self.inputScrollbar.set
 
         """Control frame section"""
 
-        self.controlFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
+        self.controlFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
-        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.encryptButton = tk.Button(self.subFrame5, text="Encrypt", command=lambda: updateOutputBox(),
             **ButtonStyle.ENCRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame5, textvariable=self.errorMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
+            bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Output frame section"""
 
-        self.outputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame6 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame6, text="Ciphertext", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.outputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame6 = tk.Frame(self.outputFrame, bg=Colours.WHITE)
+        self.title2 = tk.Label(self.subFrame6, text="Ciphertext", bg=Colours.WHITE, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
         self.copyButton2 = tk.Button(self.subFrame6, text="Copy Ciphertext", compound="left", image=self.COPY_ICON,
         command=lambda: copyOutputToClipboard(), **ButtonStyle.COPY_BUTTON)
         self.horizontalSeparator4 = tk.ttk.Separator(self.outputFrame, orient="horizontal")
-        self.subFrame7 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.outputBox = tk.Text(self.subFrame7, width=25, height=5, bd=0, wrap="word", bg=Colours.BACKGROUND,
+        self.subFrame7 = tk.Frame(self.outputFrame, bg=Colours.WHITE)
+        self.outputBox = tk.Text(self.subFrame7, width=25, height=5, bd=0, wrap="word", bg=Colours.WHITE,
             fg=Colours.GREY_FOREGROUND, font=Fonts.TEXT, state="disabled", cursor="X_cursor")
         self.outputScrollbar = tk.Scrollbar(self.subFrame7, command=self.outputBox.yview)
         self.outputBox['yscrollcommand'] = self.outputScrollbar.set
-
-        self.subFrameGuide = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.horizontalSeparatorGuide = tk.ttk.Separator(self.outputFrame, orient="horizontal")
-        self.guidelink = tk.Label(self.outputFrame, text="Want to learn how the process is done? Click here!",
-            bg=Colours.BACKGROUND, fg=Colours.GUIDE_LINK, cursor="hand2")
-        self.guidelink.bind("<Button-1>", lambda e: openguide())
 
         """Widget placment"""
 
@@ -785,7 +789,6 @@ class EncryptMenu(tk.Frame):
         self.subFrame7.grid(sticky="w")
         self.outputBox.grid(padx=16, pady=25)
         self.outputScrollbar.grid(row=0, column=1, sticky='nsew')
-        self.subFrameGuide.grid(sticky="w")
 
         """ Hover effects """
 
@@ -852,33 +855,25 @@ class EncryptMenu(tk.Frame):
             self.error.grid_forget()  # Removes the error message
             self.errorMessage.set("")
 
-            self.guide_data, cipherText = multicrypt.encrypt(plaintext=p, passKey=(k, k2, k3),
+            cipherText, timeTaken = multicrypt.encrypt(plaintext=p, passKey=(k, k2, k3),
                 cipher=self.cipher, dataformat=self.dataFormat)
 
             self.outputBox.configure(state="normal", cursor="xterm")
             self.outputBox.insert("1.0", cipherText)
-            self.horizontalSeparatorGuide.grid(sticky="we")
-            self.guidelink.grid(sticky="w", pady=(5, 0))
 
         def copyInputToClipboard():
             i = self.inputBox.get()
             i = i.split("\n")[0]  # The new line character is ommited.
+
             self.master.clipboard_clear()
             self.master.clipboard_append(i)
 
         def copyOutputToClipboard():
             o = self.outputBox.get("1.0", "end")
             o = o.split("\n")[0]  # The new line character is ommited.
+
             self.master.clipboard_clear()
             self.master.clipboard_append(o)
-
-        def openguide():
-            # Converts guide data dictionary to url form
-            url_data = urllib.parse.urlencode(self.guide_data)
-
-            # Opens default windows browser. Without it, it opens IE.
-            url = r"https://localhost/padlock/triple-DES/triple-DES.html?" + (url_data)
-            webbrowser.get('windows-default').open_new(url)
 
         self.errorMessage = tk.StringVar()  # Text variable that stores the different error messages
 
@@ -898,7 +893,7 @@ class EncryptMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag2 = tk.Label(self.header, text=self.dataFormat, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag3 = tk.Label(self.header, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag3 = tk.Label(self.header, text=self.cipher, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -916,75 +911,69 @@ class EncryptMenu(tk.Frame):
 
         """Input frame section"""
 
-        self.inputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
-        self.title = tk.Label(self.subFrame, text="Plaintext", bg=Colours.BACKGROUND, fg=Colours.TITLE_FG, font=Fonts.TITLE)
+        self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
+        self.title = tk.Label(self.subFrame, text="Plaintext", bg=Colours.WHITE, fg=Colours.TITLE_FG, font=Fonts.TITLE)
         self.copyButton = tk.Button(self.subFrame, text="Copy Plaintext", compound="left", image=self.COPY_ICON,
         command=lambda: copyInputToClipboard(), **ButtonStyle.COPY_BUTTON)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
-        self.subFrame2 = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
+        self.subFrame2 = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.inputBox = tk.Entry(self.subFrame2, width=24, font=Fonts.TEXT, relief="flat")
         self.inputScrollbar = tk.Scrollbar(self.subFrame2, orient="horizontal", command=self.inputBox.xview)
         self.inputBox['xscrollcommand'] = self.inputScrollbar.set
 
         """Control frame section"""
 
-        self.controlFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
+        self.controlFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
 
         # Key section 1
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         # Key section 2
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox2 = tk.Entry(self.subFrame5, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         # Key section 3
         self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox3 = tk.Entry(self.subFrame6, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.encryptButton = tk.Button(self.subFrame7, text="Encrypt", command=lambda: updateOutputBox(),
             **ButtonStyle.ENCRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame7, textvariable=self.errorMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
+            bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Output frame section"""
 
-        self.outputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame8 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame8, text="Ciphertext", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.outputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame8 = tk.Frame(self.outputFrame, bg=Colours.WHITE)
+        self.title2 = tk.Label(self.subFrame8, text="Ciphertext", bg=Colours.WHITE, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
         self.copyButton2 = tk.Button(self.subFrame8, text="Copy Ciphertext", compound="left", image=self.COPY_ICON,
         command=lambda: copyOutputToClipboard(), **ButtonStyle.COPY_BUTTON)
 
         self.horizontalSeparator6 = tk.ttk.Separator(self.outputFrame, orient="horizontal")
-        self.subFrame9 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.outputBox = tk.Text(self.subFrame9, width=25, height=10, bd=0, wrap="word", bg=Colours.BACKGROUND,
+        self.subFrame9 = tk.Frame(self.outputFrame, bg=Colours.WHITE)
+        self.outputBox = tk.Text(self.subFrame9, width=25, height=10, bd=0, wrap="word", bg=Colours.WHITE,
             fg=Colours.GREY_FOREGROUND, font=Fonts.TEXT, state="disabled", cursor="X_cursor")
         self.outputScrollbar = tk.Scrollbar(self.subFrame9, command=self.outputBox.yview)
         self.outputBox['yscrollcommand'] = self.outputScrollbar.set
-
-        self.subFrameGuide = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.horizontalSeparatorGuide = tk.ttk.Separator(self.outputFrame, orient="horizontal")
-        self.guidelink = tk.Label(self.outputFrame, text="Want to learn how the process is done? Click here!",
-            bg=Colours.BACKGROUND, fg=Colours.GUIDE_LINK, cursor="hand2")
-        self.guidelink.bind("<Button-1>", lambda e: openguide())
 
         """Widget placment"""
 
@@ -1024,7 +1013,6 @@ class EncryptMenu(tk.Frame):
         self.subFrame9.grid(sticky="w")
         self.outputBox.grid(padx=16, pady=20)
         self.outputScrollbar.grid(row=0, column=1, sticky='nsew')
-        self.subFrameGuide.grid(sticky="w")
 
         """ Hover effects """
 
@@ -1045,6 +1033,7 @@ class EncryptMenu(tk.Frame):
         def uploadFile():
             if self.cipherMode == "Base64":
                 self.fileObj = tk.filedialog.askopenfile(title='Choose any file to encrypt', filetypes=[("Select files", "*.*")])
+
             else:
                 self.fileObj = tk.filedialog.askopenfile(title='Choose a text file to encrypt', filetypes=[("Select files", "*.txt")])
 
@@ -1056,10 +1045,13 @@ class EncryptMenu(tk.Frame):
                 return None
 
             # If image size is greater than 1MB, it is not accepted
-            if os.path.getsize(self.fileObj.name) > 1000000:
+            self.maxSize = 1000000
+
+            if os.path.getsize(self.fileObj.name) > self.maxSize:
                 self.fileInfo.grid(sticky="w", padx=10, pady=(5, 0))
                 self.fileInfo.configure(fg=Colours.ERROR)
                 self.fileInfo_text.set("ERROR: File size too large to upload.")
+
             else:
                 self.fileInfo.grid(sticky="w", padx=10, pady=(5, 0))
                 self.fileInfo.configure(fg=Colours.INFO)
@@ -1074,13 +1066,16 @@ class EncryptMenu(tk.Frame):
 
         def encryptFile(k):
             try:
-                BLANK, (newFilepath, timeTaken) = multicrypt.encrypt(filename=self.filename, filepath=self.filepath, passKey=k,
+                newFilepath, timeTaken = multicrypt.encrypt(filename=self.filename, filepath=self.filepath, passKey=k,
                     cipher=self.cipher, dataformat=self.dataFormat, cipherMode=self.cipherMode)
+
             except Exception as ex:
+                print(ex)
+
                 self.encryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.ERROR)
                 self.statusMessage.set("File encryption failed!")
-                print(ex)
+
             else:
                 self.encryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.STATUS_OK)
@@ -1154,7 +1149,7 @@ class EncryptMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag3 = tk.Label(self.header, text=self.cipherMode, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -1175,43 +1170,43 @@ class EncryptMenu(tk.Frame):
 
         """Input frame section"""
 
-        self.inputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
+        self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
         self.upload_fileButton = tk.Button(self.subFrame, text="UPLOAD TEXT FILE", compound="left", image=self.IMAGE_UPLOAD,
         command=lambda: uploadFile(), **ButtonStyle.UPLOAD_BUTTON)
         self.fileInfo = tk.Label(self.subFrame, textvariable=self.fileInfo_text, wraplength=300, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.INFO, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.INFO, font=Fonts.INFO)
 
         """Control frame section"""
 
-        self.controlFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
+        self.controlFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
-        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.encryptButton = tk.Button(self.subFrame5, text="Encrypt", command=lambda: encryptFileController(),
             **ButtonStyle.ENCRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame5, textvariable=self.errorMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
+            bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Status frame section"""
 
-        self.statusFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame7 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame7, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.statusFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame7 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
+        self.title2 = tk.Label(self.subFrame7, text="Status", bg=Colours.WHITE, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
         self.horizontalSeparator5 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
-        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
+        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
         self.status = tk.Label(self.subFrame8, textvariable=self.statusMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
 
         """Widget placment"""
 
@@ -1252,6 +1247,7 @@ class EncryptMenu(tk.Frame):
         def uploadFile():
             if self.cipherMode == "Base64":
                 self.fileObj = tk.filedialog.askopenfile(title='Choose any file to encrypt', filetypes=[("Select files", "*.*")])
+
             else:
                 self.fileObj = tk.filedialog.askopenfile(title='Choose a text file to encrypt', filetypes=[("Select files", "*.txt")])
 
@@ -1263,10 +1259,13 @@ class EncryptMenu(tk.Frame):
                 return None
 
             # If image size is greater than 1MB, it is not accepted
-            if os.path.getsize(self.fileObj.name) > 1000000:
+            self.maxSize = 1000000
+
+            if os.path.getsize(self.fileObj.name) > self.maxSize:
                 self.fileInfo.grid(sticky="w", padx=10, pady=(5, 0))
                 self.fileInfo.configure(fg=Colours.ERROR)
                 self.fileInfo_text.set("ERROR: File size too large to upload.")
+
             else:
                 self.fileInfo.grid(sticky="w", padx=10, pady=(5, 0))
                 self.fileInfo.configure(fg=Colours.INFO)
@@ -1281,13 +1280,16 @@ class EncryptMenu(tk.Frame):
 
         def encryptFile(k, k2, k3):
             try:
-                BLANK, (newFilepath, timeTaken) = multicrypt.encrypt(filename=self.filename, filepath=self.filepath, passKey=(k, k2, k3),
+                newFilepath, timeTaken = multicrypt.encrypt(filename=self.filename, filepath=self.filepath, passKey=(k, k2, k3),
                     cipher=self.cipher, dataformat=self.dataFormat, cipherMode=self.cipherMode)
+
             except Exception as ex:
+                print(ex)
+
                 self.encryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.ERROR)
                 self.statusMessage.set("File encryption failed!")
-                print(ex)
+
             else:
                 self.encryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.STATUS_OK)
@@ -1376,7 +1378,7 @@ class EncryptMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag3 = tk.Label(self.header, text=self.cipherMode, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -1397,61 +1399,61 @@ class EncryptMenu(tk.Frame):
 
         """Input frame section"""
 
-        self.inputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
+        self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
         self.upload_fileButton = tk.Button(self.subFrame, text="UPLOAD TEXT FILE", compound="left", image=self.IMAGE_UPLOAD,
         command=lambda: uploadFile(), **ButtonStyle.UPLOAD_BUTTON)
         self.fileInfo = tk.Label(self.subFrame, textvariable=self.fileInfo_text, wraplength=400, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.INFO, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.INFO, font=Fonts.INFO)
 
         """Control frame section"""
 
-        self.controlFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
+        self.controlFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
 
         # Key section 1
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         # Key section 2
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox2 = tk.Entry(self.subFrame5, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         # Key section 3
         self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox3 = tk.Entry(self.subFrame6, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.encryptButton = tk.Button(self.subFrame7, text="Encrypt", command=lambda: encryptFileController(),
             **ButtonStyle.ENCRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame7, textvariable=self.errorMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
+            bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Status frame section"""
 
-        self.statusFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame8, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.statusFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
+        self.title2 = tk.Label(self.subFrame8, text="Status", bg=Colours.WHITE, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
         self.horizontalSeparator6 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
-        self.subFrame9 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
+        self.subFrame9 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
         self.status = tk.Label(self.subFrame9, textvariable=self.statusMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
 
         """Widget placment"""
 
@@ -1508,10 +1510,13 @@ class EncryptMenu(tk.Frame):
                 return None
 
             # If image size is greater than 1MB, it is not accepted
-            if os.path.getsize(self.imgObj.name) > 1000000:
+            self.maxSize = 1000000
+
+            if os.path.getsize(self.imgObj.name) > self.maxSize:
                 self.imageInfo.grid(sticky="w", padx=10, pady=(5, 0))
                 self.imageInfo.configure(fg=Colours.ERROR)
                 self.imageInfo_text.set("ERROR: Image size too large to upload.")
+
             else:
                 self.imageInfo.grid(sticky="w", padx=10, pady=(5, 0))
                 self.imageInfo.configure(fg=Colours.INFO)
@@ -1526,13 +1531,16 @@ class EncryptMenu(tk.Frame):
 
         def encryptImage(k):
             try:
-                BLANK, (newFilepath, timeTaken) = multicrypt.encrypt(filename=self.filename, filepath=self.filepath,
+                newFilepath, timeTaken = multicrypt.encrypt(filename=self.filename, filepath=self.filepath,
                     passKey=k, cipher=self.cipher, dataformat=self.dataFormat)
+
             except Exception as ex:
+                print(ex)
+
                 self.encryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.ERROR)
                 self.statusMessage.set("Image encryption failed!")
-                print(ex)
+
             else:
                 self.encryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.STATUS_OK)
@@ -1597,7 +1605,7 @@ class EncryptMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag2 = tk.Label(self.header, text=self.dataFormat, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag3 = tk.Label(self.header, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag3 = tk.Label(self.header, text=self.cipher, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -1615,43 +1623,43 @@ class EncryptMenu(tk.Frame):
 
         """Input frame section"""
 
-        self.inputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
+        self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
         self.upload_imageButton = tk.Button(self.subFrame, text="UPLOAD IMAGE", compound="left", image=self.IMAGE_UPLOAD,
         command=lambda: uploadImage(), **ButtonStyle.UPLOAD_BUTTON)
         self.imageInfo = tk.Label(self.subFrame, textvariable=self.imageInfo_text, wraplength=400, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.INFO, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.INFO, font=Fonts.INFO)
 
         """Control frame section"""
 
-        self.controlFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
+        self.controlFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
-        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.encryptButton = tk.Button(self.subFrame5, text="Encrypt", command=lambda: encryptImageController(),
             **ButtonStyle.ENCRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame5, textvariable=self.errorMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
+            bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Status frame section"""
 
-        self.statusFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame7 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame7, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.statusFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame7 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
+        self.title2 = tk.Label(self.subFrame7, text="Status", bg=Colours.WHITE, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
         self.horizontalSeparator5 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
-        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
+        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
         self.status = tk.Label(self.subFrame8, textvariable=self.statusMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
 
         """Widget placment"""
 
@@ -1700,10 +1708,13 @@ class EncryptMenu(tk.Frame):
                 return None
 
             # If image size is greater than 1MB, it is not accepted
-            if os.path.getsize(self.imgObj.name) > 1000000:
+            self.maxSize = 1000000
+
+            if os.path.getsize(self.imgObj.name) > self.maxSize:
                 self.imageInfo.grid(sticky="w", padx=10, pady=(5, 0))
                 self.imageInfo.configure(fg=Colours.ERROR)
                 self.imageInfo_text.set("ERROR: Image size too large to upload.")
+
             else:
                 self.imageInfo.grid(sticky="w", padx=10, pady=(5, 0))
                 self.imageInfo.configure(fg=Colours.INFO)
@@ -1718,13 +1729,16 @@ class EncryptMenu(tk.Frame):
 
         def encryptImage(k, k2, k3):
             try:
-                BLANK, (newFilepath, timeTaken) = multicrypt.encrypt(filename=self.filename, filepath=self.filepath,
+                newFilepath, timeTaken = multicrypt.encrypt(filename=self.filename, filepath=self.filepath,
                     passKey=(k, k2, k3), cipher=self.cipher, dataformat=self.dataFormat)
+
             except Exception as ex:
+                print(ex)
+
                 self.encryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.ERROR)
                 self.statusMessage.set("Image encryption failed!")
-                print(ex)
+
             else:
                 self.encryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.STATUS_OK)
@@ -1811,7 +1825,7 @@ class EncryptMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag2 = tk.Label(self.header, text=self.dataFormat, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag3 = tk.Label(self.header, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag3 = tk.Label(self.header, text=self.cipher, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -1829,61 +1843,61 @@ class EncryptMenu(tk.Frame):
 
         """Input frame section"""
 
-        self.inputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
+        self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
         self.upload_imageButton = tk.Button(self.subFrame, text="UPLOAD IMAGE", compound="left", image=self.IMAGE_UPLOAD,
         command=lambda: uploadImage(), **ButtonStyle.UPLOAD_BUTTON)
         self.imageInfo = tk.Label(self.subFrame, textvariable=self.imageInfo_text, wraplength=400, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.INFO, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.INFO, font=Fonts.INFO)
 
         """Control frame section"""
 
-        self.controlFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
+        self.controlFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
 
         # Key section 1
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         # Key section 2
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox2 = tk.Entry(self.subFrame5, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         # Key section 3
         self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox3 = tk.Entry(self.subFrame6, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.encryptButton = tk.Button(self.subFrame7, text="Encrypt", command=lambda: encryptImageController(),
             **ButtonStyle.ENCRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame7, textvariable=self.errorMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
+            bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Status frame section"""
 
-        self.statusFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame8, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.statusFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
+        self.title2 = tk.Label(self.subFrame8, text="Status", bg=Colours.WHITE, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
         self.horizontalSeparator6 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
-        self.subFrame9 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
+        self.subFrame9 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
         self.status = tk.Label(self.subFrame9, textvariable=self.statusMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
 
         """Widget placment"""
 
@@ -1959,17 +1973,21 @@ class DecryptMenu(tk.Frame):
             # Triple DES requires a separate section
             if self.cipher == "Triple DES Cipher":
                 self.messageSectionForTripleDES()
+
             else:
                 self.messageSection()
+
         elif self.dataFormat == "Files":
             if self.cipher == "Triple DES Cipher":
                 self.fileSectionForTripleDES()
+
             else:
                 self.fileSection()
 
         elif self.dataFormat == "Images":
             if self.cipher == "Triple DES Cipher":
                 self.imageSectionForTripleDES()
+
             else:
                 self.imageSection()
 
@@ -2004,60 +2022,40 @@ class DecryptMenu(tk.Frame):
             # ONLY for Vigenere Cipher in CLASSIC mode
             if self.cipher == "Vigenere Cipher" and self.cipherMode == "Classic" and not(k.isalpha()):
                 self.errorMessage.set("The key must not contain any ASCII characters.")
-                self.guidelink.grid_forget()
                 return None
 
             self.error.grid_forget()  # Removes the error message
             self.errorMessage.set("")
 
             try:
-                self.guide_data, plainText = multicrypt.decrypt(ciphertext=c, passKey=k, cipher=self.cipher,
+                plainText, timeTaken = multicrypt.decrypt(ciphertext=c, passKey=k, cipher=self.cipher,
                     dataformat=self.dataFormat, cipherMode=self.cipherMode)
+
             except Exception as exc:
                 print(exc)
+
                 self.outputBox.configure(state="normal", cursor="xterm", fg=Colours.ERROR)
                 self.outputBox.insert("1.0", "ERROR: Decryption failed.")
                 self.outputBox.configure(state="disabled", cursor="X_cursor", fg=Colours.ERROR)
-                self.copyButton2.configure(state="disabled", bg="grey", fg="#FFF")
+                self.copyButton2.configure(state="disabled", bg=Colours.GREY_FOREGROUND, fg=Colours.WHITE)
+
             else:
                 self.outputBox.configure(state="normal", cursor="xterm")
                 self.outputBox.insert("1.0", plainText)
-                self.horizontalSeparatorGuide.grid(sticky="we")
-                self.guidelink.grid(sticky="w", pady=(5, 0))
 
         def copyInputToClipboard():
             i = self.inputBox.get()
             i = i.split("\n")[0]  # The new line character is ommited.
+
             self.master.clipboard_clear()
             self.master.clipboard_append(i)
 
         def copyOutputToClipboard():
             o = self.outputBox.get("1.0", "end")
             o = o.split("\n")[0]  # The new line character is ommited.
+
             self.master.clipboard_clear()
             self.master.clipboard_append(o)
-
-        def openguide():
-            # Converts guide data dictionary to url form
-            url_data = urllib.parse.urlencode(self.guide_data)
-
-            # Opens default windows browser. Without it, it opens IE.
-            if self.cipher == "Caesar Cipher":
-                if self.cipherMode == "ASCII":
-                    url = r"http://localhost/padlock/caesar/caesar_ASCII.html?" + (url_data)
-                else:
-                    url = r"http://localhost/padlock/caesar/caesar_classic.html?" + (url_data)
-
-            elif self.cipher == "Vigenere Cipher":
-                if self.cipherMode == "ASCII":
-                    url = r"http://localhost/padlock/vigenere/vigenere_ASCII.html?" + (url_data)
-                else:
-                    url = r"http://localhost/padlock/vigenere/vigenere_classic.html?" + (url_data)
-
-            elif self.cipher == "DES Cipher":
-                url = r"http://localhost/padlock/DES/DES.html?" + (url_data)
-
-            webbrowser.get('windows-default').open_new(url)
 
         self.errorMessage = tk.StringVar()  # Text variable that stores the different error messages
 
@@ -2079,7 +2077,7 @@ class DecryptMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag3 = tk.Label(self.header, text=self.cipherMode, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -2089,8 +2087,9 @@ class DecryptMenu(tk.Frame):
         self.sectionTag2.grid(column=3, row=0, pady=(10, 0), padx=10)
 
         # DES cipher and AES cipher have no modes so this won't display the mode tag
-        if self.cipher in ("DES Cipher", "AES Cipher"):
+        if self.cipher in ("DES Cipher", "AES Cipher", "RC4 Cipher"):
             self.sectionTag4.grid(column=5, row=0, sticky="ns", ipadx=40, pady=(10, 0), padx=10)
+
         else:
             self.sectionTag3.grid(column=4, row=0, pady=(10, 0), padx=10)
             self.sectionTag4.grid(column=5, row=0, sticky="ns", ipadx=40, pady=(10, 0), padx=10)
@@ -2105,56 +2104,50 @@ class DecryptMenu(tk.Frame):
 
         """Input frame section"""
 
-        self.inputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
-        self.title = tk.Label(self.subFrame, text="Ciphertext", bg=Colours.BACKGROUND, fg=Colours.TITLE_FG, font=Fonts.TITLE)
+        self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
+        self.title = tk.Label(self.subFrame, text="Ciphertext", bg=Colours.WHITE, fg=Colours.TITLE_FG, font=Fonts.TITLE)
         self.copyButton = tk.Button(self.subFrame, text="Copy Ciphertext", compound="left", image=self.COPY_ICON,
         command=lambda: copyInputToClipboard(), **ButtonStyle.COPY_BUTTON)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
-        self.subFrame2 = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
+        self.subFrame2 = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.inputBox = tk.Entry(self.subFrame2, width=24, font=Fonts.TEXT, relief="flat")
         self.inputScrollbar = tk.Scrollbar(self.subFrame2, orient="horizontal", command=self.inputBox.xview)
         self.inputBox['xscrollcommand'] = self.inputScrollbar.set
 
         """Control frame section"""
 
-        self.controlFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
+        self.controlFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
 
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.decryptButton = tk.Button(self.subFrame5, text="Decrypt", command=lambda: updateOutputBox(),
             **ButtonStyle.DECRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame5, textvariable=self.errorMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
+            bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Output frame section"""
 
-        self.outputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame6 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame6, text="Plaintext", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.outputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame6 = tk.Frame(self.outputFrame, bg=Colours.WHITE)
+        self.title2 = tk.Label(self.subFrame6, text="Plaintext", bg=Colours.WHITE, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
         self.copyButton2 = tk.Button(self.subFrame6, text="Copy Plaintext", compound="left", image=self.COPY_ICON,
         command=lambda: copyOutputToClipboard(), **ButtonStyle.COPY_BUTTON)
         self.horizontalSeparator4 = tk.ttk.Separator(self.outputFrame, orient="horizontal")
-        self.subFrame7 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.outputBox = tk.Text(self.subFrame7, width=26, height=5, bd=0, wrap="word", bg=Colours.BACKGROUND,
+        self.subFrame7 = tk.Frame(self.outputFrame, bg=Colours.WHITE)
+        self.outputBox = tk.Text(self.subFrame7, width=26, height=5, bd=0, wrap="word", bg=Colours.WHITE,
             fg=Colours.GREY_FOREGROUND, font=Fonts.TEXT, state="disabled", cursor="X_cursor")
         self.outputScrollbar = tk.Scrollbar(self.subFrame7, command=self.outputBox.yview)
         self.outputBox['yscrollcommand'] = self.outputScrollbar.set
-
-        self.subFrameGuide = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.horizontalSeparatorGuide = tk.ttk.Separator(self.outputFrame, orient="horizontal")
-        self.guidelink = tk.Label(self.outputFrame, text="Want to learn how the process is done? Click here!",
-            bg=Colours.BACKGROUND, fg=Colours.GUIDE_LINK, cursor="hand2")
-        self.guidelink.bind("<Button-1>", lambda e: openguide())
 
         """Widget placment"""
 
@@ -2186,7 +2179,6 @@ class DecryptMenu(tk.Frame):
         self.subFrame7.grid(sticky="w")
         self.outputBox.grid(padx=16, pady=16)
         self.outputScrollbar.grid(row=0, column=1, sticky='nsew')
-        self.subFrameGuide.grid(sticky="w")
 
         """ Hover effects """
 
@@ -2254,39 +2246,34 @@ class DecryptMenu(tk.Frame):
             self.errorMessage.set("")
 
             try:
-                self.guide_data, plainText = multicrypt.decrypt(ciphertext=c, passKey=(k, k2, k3), cipher=self.cipher,
+                plainText, timeTaken = multicrypt.decrypt(ciphertext=c, passKey=(k, k2, k3), cipher=self.cipher,
                     dataformat=self.dataFormat)
+
             except Exception as exc:
                 print(exc)
+
                 self.outputBox.configure(state="normal", cursor="xterm", fg=Colours.ERROR)
                 self.outputBox.insert("1.0", "ERROR: Decryption failed.")
                 self.outputBox.configure(state="disabled", cursor="X_cursor", fg=Colours.ERROR)
-                self.copyButton2.configure(state="disabled", bg="grey", fg="#FFF")
+                self.copyButton2.configure(state="disabled", bg=Colours.GREY_FOREGROUND, fg=Colours.WHITE)
+
             else:
                 self.outputBox.configure(state="normal", cursor="xterm")
                 self.outputBox.insert("1.0", plainText)
-                self.horizontalSeparatorGuide.grid(sticky="we")
-                self.guidelink.grid(sticky="w", pady=(5, 0))
 
         def copyInputToClipboard():
             i = self.inputBox.get()
             i = i.split("\n")[0]  # The new line character is ommited.
+
             self.master.clipboard_clear()
             self.master.clipboard_append(i)
 
         def copyOutputToClipboard():
             o = self.outputBox.get("1.0", "end")
             o = o.split("\n")[0]  # The new line character is ommited.
+
             self.master.clipboard_clear()
             self.master.clipboard_append(o)
-
-        def openguide():
-            # Converts guide data dictionary to url form
-            url_data = urllib.parse.urlencode(self.guide_data)
-
-            # Opens default windows browser. Without it, it opens IE.
-            url = r"http://localhost/padlock/triple-DES/triple-DES.html?" + (url_data)
-            webbrowser.get('windows-default').open_new(url)
 
         self.errorMessage = tk.StringVar()  # Text variable that stores the different error messages
 
@@ -2308,7 +2295,7 @@ class DecryptMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag3 = tk.Label(self.header, text=self.cipherMode, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -2327,75 +2314,69 @@ class DecryptMenu(tk.Frame):
 
         """Input frame section"""
 
-        self.inputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
-        self.title = tk.Label(self.subFrame, text="Ciphertext", bg=Colours.BACKGROUND, fg=Colours.TITLE_FG, font=Fonts.TITLE)
+        self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
+        self.title = tk.Label(self.subFrame, text="Ciphertext", bg=Colours.WHITE, fg=Colours.TITLE_FG, font=Fonts.TITLE)
         self.copyButton = tk.Button(self.subFrame, text="Copy Ciphertext", compound="left", image=self.COPY_ICON,
         command=lambda: copyInputToClipboard(), **ButtonStyle.COPY_BUTTON)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
-        self.subFrame2 = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
+        self.subFrame2 = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.inputBox = tk.Entry(self.subFrame2, width=24, font=Fonts.TEXT, relief="flat")
         self.inputScrollbar = tk.Scrollbar(self.subFrame2, orient="horizontal", command=self.inputBox.xview)
         self.inputBox['xscrollcommand'] = self.inputScrollbar.set
 
         """Control frame section"""
 
-        self.controlFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
+        self.controlFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
 
         # Key section 1
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         # Key section 2
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox2 = tk.Entry(self.subFrame5, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         # Key section 3
         self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox3 = tk.Entry(self.subFrame6, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.decryptButton = tk.Button(self.subFrame6, text="Decrypt", command=lambda: updateOutputBox(),
             **ButtonStyle.DECRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame6, textvariable=self.errorMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
+            bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Output frame section"""
 
-        self.outputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame8 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame8, text="Plaintext", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.outputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame8 = tk.Frame(self.outputFrame, bg=Colours.WHITE)
+        self.title2 = tk.Label(self.subFrame8, text="Plaintext", bg=Colours.WHITE, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
         self.copyButton2 = tk.Button(self.subFrame8, text="Copy Plaintext", compound="left", image=self.COPY_ICON,
         command=lambda: copyOutputToClipboard(), **ButtonStyle.COPY_BUTTON)
 
         self.horizontalSeparator6 = tk.ttk.Separator(self.outputFrame, orient="horizontal")
-        self.subFrame9 = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.outputBox = tk.Text(self.subFrame9, width=26, height=10, bd=0, wrap="word", bg=Colours.BACKGROUND,
+        self.subFrame9 = tk.Frame(self.outputFrame, bg=Colours.WHITE)
+        self.outputBox = tk.Text(self.subFrame9, width=26, height=10, bd=0, wrap="word", bg=Colours.WHITE,
             fg=Colours.GREY_FOREGROUND, font=Fonts.TEXT, state="disabled", cursor="X_cursor")
         self.outputScrollbar = tk.Scrollbar(self.subFrame9, command=self.outputBox.yview)
         self.outputBox['yscrollcommand'] = self.outputScrollbar.set
-
-        self.subFrameGuide = tk.Frame(self.outputFrame, bg=Colours.BACKGROUND)
-        self.horizontalSeparatorGuide = tk.ttk.Separator(self.outputFrame, orient="horizontal")
-        self.guidelink = tk.Label(self.outputFrame, text="Want to learn how the process is done? Click here!",
-            bg=Colours.BACKGROUND, fg=Colours.GUIDE_LINK, cursor="hand2")
-        self.guidelink.bind("<Button-1>", lambda e: openguide())
 
         """Widget placment"""
 
@@ -2435,7 +2416,6 @@ class DecryptMenu(tk.Frame):
         self.subFrame9.grid(sticky="w")
         self.outputBox.grid(padx=16, pady=20)
         self.outputScrollbar.grid(row=0, column=1, sticky='nsew')
-        self.subFrameGuide.grid(sticky="w")
 
         """ Hover effects """
 
@@ -2456,6 +2436,7 @@ class DecryptMenu(tk.Frame):
         def uploadFile():
             if self.cipherMode == "Base64":
                 self.fileObj = tk.filedialog.askopenfile(title='Choose any file to decrypt', filetypes=[("Select files", "*.*")])
+
             else:
                 self.fileObj = tk.filedialog.askopenfile(title='Choose a text file to decrypt', filetypes=[("Select files", "*.txt")])
 
@@ -2479,13 +2460,16 @@ class DecryptMenu(tk.Frame):
 
         def decryptFile(k):
             try:
-                BLANK, (newFilepath, timeTaken) = multicrypt.decrypt(filename=self.filename, filepath=self.filepath, passKey=k,
+                newFilepath, timeTaken = multicrypt.decrypt(filename=self.filename, filepath=self.filepath, passKey=k,
                     cipher=self.cipher, dataformat=self.dataFormat, cipherMode=self.cipherMode)
+
             except Exception as ex:
+                print(ex)
+
                 self.decryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.ERROR)
                 self.statusMessage.set("File decryption failed!")
-                print(ex)
+
             else:
                 self.decryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.STATUS_OK)
@@ -2558,7 +2542,7 @@ class DecryptMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag3 = tk.Label(self.header, text=self.cipherMode, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -2579,43 +2563,43 @@ class DecryptMenu(tk.Frame):
 
         """Input frame section"""
 
-        self.inputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
+        self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
         self.upload_fileButton = tk.Button(self.subFrame, text="UPLOAD TEXT FILE", compound="left", image=self.IMAGE_UPLOAD,
         command=lambda: uploadFile(), **ButtonStyle.UPLOAD_BUTTON)
         self.fileInfo = tk.Label(self.subFrame, textvariable=self.fileInfo_text, wraplength=400, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.INFO, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.INFO, font=Fonts.INFO)
 
         """Control frame section"""
 
-        self.controlFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
+        self.controlFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
 
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.decryptButton = tk.Button(self.subFrame5, text="Decrypt", command=lambda: decryptFileController(),
             **ButtonStyle.DECRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame5, textvariable=self.errorMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
+            bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Status frame section"""
 
-        self.statusFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame7 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame7, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.statusFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame7 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
+        self.title2 = tk.Label(self.subFrame7, text="Status", bg=Colours.WHITE, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
         self.horizontalSeparator5 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
-        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
+        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
         self.status = tk.Label(self.subFrame8, textvariable=self.statusMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
 
         """Widget placment"""
 
@@ -2656,6 +2640,7 @@ class DecryptMenu(tk.Frame):
         def uploadFile():
             if self.cipherMode == "Base64":
                 self.fileObj = tk.filedialog.askopenfile(title='Choose any file to decrypt', filetypes=[("Select files", "*.*")])
+
             else:
                 self.fileObj = tk.filedialog.askopenfile(title='Choose a text file to decrypt', filetypes=[("Select files", "*.txt")])
 
@@ -2679,13 +2664,16 @@ class DecryptMenu(tk.Frame):
 
         def decryptFile(k, k2, k3):
             try:
-                BLANK, (newFilepath, timeTaken) = multicrypt.decrypt(filename=self.filename, filepath=self.filepath, passKey=(k, k2, k3),
+                newFilepath, timeTaken = multicrypt.decrypt(filename=self.filename, filepath=self.filepath, passKey=(k, k2, k3),
                     cipher=self.cipher, dataformat=self.dataFormat, cipherMode=self.cipherMode)
+
             except Exception as ex:
+                print(ex)
+
                 self.decryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.ERROR)
                 self.statusMessage.set("File decryption failed!")
-                print(ex)
+
             else:
                 self.decryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.STATUS_OK)
@@ -2774,7 +2762,7 @@ class DecryptMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag3 = tk.Label(self.header, text=self.cipherMode, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -2795,62 +2783,62 @@ class DecryptMenu(tk.Frame):
 
         """Input frame section"""
 
-        self.inputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
+        self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
         self.upload_fileButton = tk.Button(self.subFrame, text="UPLOAD TEXT FILE", compound="left", image=self.IMAGE_UPLOAD,
         command=lambda: uploadFile(), **ButtonStyle.UPLOAD_BUTTON)
         self.fileInfo = tk.Label(self.subFrame, textvariable=self.fileInfo_text, wraplength=400, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.INFO, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.INFO, font=Fonts.INFO)
 
         """Control frame section"""
 
-        self.controlFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
+        self.controlFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
 
         # Key section 1
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         # Key section 2
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox2 = tk.Entry(self.subFrame5, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         # Key section 3
         self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox3 = tk.Entry(self.subFrame6, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.decryptButton = tk.Button(self.subFrame7, text="Decrypt", command=lambda: decryptFileController(),
             **ButtonStyle.DECRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame7, textvariable=self.errorMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
+            bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Status frame section"""
 
-        self.statusFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame8, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG,
+        self.statusFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
+        self.title2 = tk.Label(self.subFrame8, text="Status", bg=Colours.WHITE, fg=Colours.TITLE2_FG,
             font=Fonts.TITLE)
         self.horizontalSeparator6 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
-        self.subFrame9 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
+        self.subFrame9 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
         self.status = tk.Label(self.subFrame9, textvariable=self.statusMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
 
         """Widget placment"""
 
@@ -2918,13 +2906,16 @@ class DecryptMenu(tk.Frame):
 
         def decryptImage(k):
             try:
-                BLANK, (newFilepath, timeTaken) = multicrypt.decrypt(filename=self.filename, filepath=self.filepath,
+                newFilepath, timeTaken = multicrypt.decrypt(filename=self.filename, filepath=self.filepath,
                     passKey=k, cipher=self.cipher, dataformat=self.dataFormat)
+
             except Exception as ex:
+                print(ex)
+
                 self.decryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.ERROR)
                 self.statusMessage.set("Image decryption failed!")
-                print(ex)
+
             else:
                 self.decryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.STATUS_OK)
@@ -2992,7 +2983,7 @@ class DecryptMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag3 = tk.Label(self.header, text=self.cipherMode, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -3011,43 +3002,43 @@ class DecryptMenu(tk.Frame):
 
         """Input frame section"""
 
-        self.inputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
+        self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
         self.upload_imageButton = tk.Button(self.subFrame, text="UPLOAD IMAGE", compound="left", image=self.IMAGE_UPLOAD,
             command=lambda: uploadImage(), **ButtonStyle.UPLOAD_BUTTON)
         self.imageInfo = tk.Label(self.subFrame, textvariable=self.imageInfo_text, wraplength=400, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.INFO, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.INFO, font=Fonts.INFO)
 
         """Control frame section"""
 
-        self.controlFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
+        self.controlFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
 
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
+        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.decryptButton = tk.Button(self.subFrame5, text="Decrypt", command=lambda: decryptImageController(),
             **ButtonStyle.DECRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame5, textvariable=self.errorMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
+            bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Status frame section"""
 
-        self.statusFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame7 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame7, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.statusFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame7 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
+        self.title2 = tk.Label(self.subFrame7, text="Status", bg=Colours.WHITE, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
         self.horizontalSeparator5 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
-        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
+        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
         self.status = tk.Label(self.subFrame8, textvariable=self.statusMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
 
         """Widget placment"""
 
@@ -3106,13 +3097,16 @@ class DecryptMenu(tk.Frame):
 
         def decryptImage(k, k2, k3):
             try:
-                BLANK, (newFilepath, timeTaken) = multicrypt.decrypt(filename=self.filename, filepath=self.filepath,
+                newFilepath, timeTaken = multicrypt.decrypt(filename=self.filename, filepath=self.filepath,
                     passKey=(k, k2, k3), cipher=self.cipher, dataformat=self.dataFormat)
+
             except Exception as ex:
+                print(ex)
+
                 self.decryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.ERROR)
                 self.statusMessage.set("Image decryption failed!")
-                print(ex)
+
             else:
                 self.decryptButton.configure(state="normal", cursor="hand2")
                 self.status.config(fg=Colours.STATUS_OK)
@@ -3202,7 +3196,7 @@ class DecryptMenu(tk.Frame):
             font=Fonts.TAGS, cursor="hand2")
         self.sectionTag3 = tk.Label(self.header, text=self.cipherMode, bg=Colours.MAIN, fg=Colours.TAGS_NOT_ACTIVE,
             font=Fonts.TAGS, cursor="hand2")
-        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.FOREGROUND,
+        self.sectionTag4 = tk.Label(self.header, text=self.cipher, bg=Colours.WHITE, fg=Colours.FOREGROUND,
             font=Fonts.TAGS)
 
         self.header.grid(row=0, sticky="new")
@@ -3221,61 +3215,61 @@ class DecryptMenu(tk.Frame):
 
         """Input frame section"""
 
-        self.inputFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.BACKGROUND)
+        self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
         self.upload_imageButton = tk.Button(self.subFrame, text="UPLOAD IMAGE", compound="left", image=self.IMAGE_UPLOAD,
         command=lambda: uploadImage(), **ButtonStyle.UPLOAD_BUTTON)
         self.imageInfo = tk.Label(self.subFrame, textvariable=self.imageInfo_text, wraplength=400, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.INFO, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.INFO, font=Fonts.INFO)
 
         """Control frame section"""
 
-        self.controlFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.BACKGROUND, fg=Colours.CIPHER_FG,
+        self.controlFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
 
         # Key section 1
         self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         # Key section 2
         self.horizontalSeparator3 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame5 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext2 = tk.Label(self.subFrame5, text="SECOND KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox2 = tk.Entry(self.subFrame5, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         # Key section 3
         self.horizontalSeparator4 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
-        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.BACKGROUND, fg=Colours.SMALL_TITLE,
+        self.subFrame6 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
+        self.subtext3 = tk.Label(self.subFrame6, text="THIRD KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE,
             font=Fonts.TITLE2)
         self.keyBox3 = tk.Entry(self.subFrame6, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
-            highlightcolor="orange", highlightbackground="grey")
+            highlightcolor=Colours.ORANGE, highlightbackground=Colours.GREY_FOREGROUND)
 
         self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
-        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.BACKGROUND)
+        self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.decryptButton = tk.Button(self.subFrame7, text="Decrypt", command=lambda: decryptImageController(),
             **ButtonStyle.DECRYPT2_BUTTON)
         self.error = tk.Label(self.subFrame7, textvariable=self.errorMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.ERROR, font=Fonts.ERROR)
+            bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Status frame section"""
 
-        self.statusFrame = tk.Frame(self, bg=Colours.BACKGROUND)
-        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
-        self.title2 = tk.Label(self.subFrame8, text="Status", bg=Colours.BACKGROUND, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
+        self.statusFrame = tk.Frame(self, bg=Colours.WHITE)
+        self.subFrame8 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
+        self.title2 = tk.Label(self.subFrame8, text="Status", bg=Colours.WHITE, fg=Colours.TITLE2_FG, font=Fonts.TITLE)
         self.horizontalSeparator6 = tk.ttk.Separator(self.statusFrame, orient="horizontal")
-        self.subFrame9 = tk.Frame(self.statusFrame, bg=Colours.BACKGROUND)
+        self.subFrame9 = tk.Frame(self.statusFrame, bg=Colours.WHITE)
         self.status = tk.Label(self.subFrame9, textvariable=self.statusMessage, wraplength=200, justify="left",
-            bg=Colours.BACKGROUND, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
+            bg=Colours.WHITE, fg=Colours.STATUS_WAIT, font=Fonts.INFO)
 
         """Widget placment"""
 

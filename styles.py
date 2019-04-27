@@ -17,7 +17,7 @@ class Colours:
     FOOTER = "#37474F"
     LOGO = "#F9A825"
     TAGS_NOT_ACTIVE = "#E6E6E6"
-    BACKGROUND = "#FFF"
+    WHITE = "#FFF"
     GREY_BACKGROUND = "#F2F4F6"
     FOREGROUND = "#000"
     GREY_FOREGROUND = "#90999E"
@@ -30,6 +30,7 @@ class Colours:
     STATUS_OK = "#4CAF50"
     STATUS_WAIT = "#FF5722"
     GUIDE_LINK = "#00BCD4"
+    ORANGE = "#FF5722"
 
 
 class Fonts:
@@ -118,7 +119,7 @@ class ButtonStyle:
 
     FILE_BUTTON = {
         "bg": "#FF5722",
-        "activebackground": "#fc683a",
+        "activebackground": "#FC683A",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -144,7 +145,7 @@ class ButtonStyle:
 
     CLASSIC_BUTTON = {
         "bg": "#FFC107",
-        "activebackground": "#ffd044",
+        "activebackground": "#FFD044",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,
@@ -235,7 +236,20 @@ class ButtonStyle:
 
     AES_BUTTON = {
         "bg": "#F44336",
-        "activebackground": "#f96854",
+        "activebackground": "#F96854",
+        "fg": "#FFF",
+        "activeforeground": "#FFF",
+        "pady": 5,
+        "padx": 10,
+        "width": 10,
+        "relief": "flat",
+        "font": ("Arial", 16),
+        "cursor": "hand2",
+    }
+
+    RC4_BUTTON = {
+        "bg": "#F44336",
+        "activebackground": "#F96854",
         "fg": "#FFF",
         "activeforeground": "#FFF",
         "pady": 5,

@@ -32,11 +32,11 @@ def getEncryptedPixel(input_pixel, shift, cipherUsed):
     B = pixel[2]
 
     """
-    For Medium and Strong ciphers, if the shift is too small, it is increase
+    For Medium and Strong ciphers, if the shift is too small, it is increased
     to avoid small shifts in colours
     """
 
-    if cipherUsed in ("DES", "TripleDES", "AES"):
+    if cipherUsed in ("DES", "TripleDES", "AES", "RC4"):
         if (shift % 256) < 20 or (256 - (shift % 256)) < 20:
             shift += 50
 
@@ -74,7 +74,7 @@ def getDecryptedPixel(input_pixel, shift, cipherUsed):
     to avoid small shifts in colours
     """
 
-    if cipherUsed in ("DES", "TripleDES", "AES"):
+    if cipherUsed in ("DES", "TripleDES", "AES", "RC4"):
         if (shift % 256) < 20 or (256 - (shift % 256)) < 20:
             shift += 50
 
@@ -105,15 +105,14 @@ def getPixelData(width, height, shifts, cipherUsed):
     In AES, the pixels are extracted vertically.
     The image is iterated column wise instead of horizontally.
     """
-    if cipherUsed == "AES":
-
+    if cipherUsed in ("AES", "RC4"):
 
         """
         Swaps the inner loops of
         itertools.product to iterate column-wise.
         """
-        verticalGenerator = ((x, y) for y in height for x in width)
 
+        verticalGenerator = ((x, y) for y in height for x in width)
 
         for pixelValue, key in zip(verticalGenerator, itertools.cycle(shifts)):
             # Returns a tuple: (pixelX, pixelY, key)
