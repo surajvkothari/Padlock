@@ -62,7 +62,7 @@ def getShiftKey_ASCII(passKey):
 
     if ASCII_sum % 95 == 0:
         ASCII_sum += 50
-
+        
     return ASCII_sum
 
 

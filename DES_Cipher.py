@@ -34,6 +34,30 @@ def getShiftValuesForImage(passKey):
     return truncatedDenaryValues
 
 
+def getHexedKey(key):
+    """ Returns the key in a hex form of exact size: 16 hex characters """
+
+    # Creates a list of each character from the key
+    key = list(key)
+
+    # Converts each character to hex in the list
+    hexedCharsList = [hex(ord(char))[2:] for char in key]
+
+    # Converts list into a string
+    hexedKey = "".join(hexedCharsList)
+
+    # Adds padding if key is shorter than 16 hex characters
+    if len(hexedKey) < 16:
+        padding = 16 - len(hexedKey)
+        hexedKey += ("00" * padding)
+
+    # Truncates key if it is longer than 16 hex characters
+    if len(hexedKey) > 16:
+        hexedKey = hexedKey[0:16]
+
+    return hexedKey
+
+
 def getHexedPlainText(plainText):
     """ Returns the plaintext in hex form and separates it into blocks of 16 into a list. """
 
@@ -72,29 +96,6 @@ def getHexedPlainText(plainText):
     hexedPlainText = [hexedPlainText[i:i+16] for i in range(0, len(hexedPlainText), 16)]
 
     return hexedPlainText
-
-
-def getHexedKey(key):
-    """ Returns the key in a hex form of exact size: 16 hex characters """
-
-    # Creates a list of each character from the key
-    key = list(key)
-
-    # Converts each character to hex in the list
-    hexedCharsList = [hex(ord(char))[2:] for char in key]
-
-    # Converts list into a string
-    hexedKey = "".join(hexedCharsList)
-
-    # Padds hexed key with 0s to make it a multiple of 16 hexadecimal characters
-    length = len(hexedKey)
-    padding = ((((length // 16) + 1) * 16) - length)
-    hexedKey += ("0" * padding)
-
-    # Truncates the hexed key to only 16 hex digits long
-    hexedKey = hexedKey[0:16]
-
-    return hexedKey
 
 
 def generateSubKeys(key):

@@ -41,7 +41,7 @@ def getShiftKeyForImage(passKey):
 
 
 def getHexedKey(key):
-    """ Returns the key in a hex form of exact size: 16 hex characters """
+    """ Returns the key in a hex form of exact size: 32 hex characters """
 
     # Creates a list of each character from the key
     key = list(key)
@@ -49,18 +49,26 @@ def getHexedKey(key):
     # Converts each character to hex in the list
     hexedCharsList = [hex(ord(char))[2:] for char in key]
 
-    if len(hexedCharsList) < 16:
-        padding = 16 - len(hexedCharsList)
-        hexedCharsList.extend(["00"] * padding)
+    # Converts list into a string
+    hexedKey = "".join(hexedCharsList)
 
-    if len(hexedCharsList) > 16:
-        hexedCharsList = hexedCharsList[0:16]
+    # Adds padding if key is shorter than 32 hex characters
+    if len(hexedKey) < 32:
+        padding = 32 - len(hexedKey)
+        hexedKey += ("00" * padding)
 
-    return hexedCharsList
+    # Truncates key if it is longer than 32 hex characters
+    if len(hexedKey) > 32:
+        hexedKey = hexedKey[0:32]
+
+    # Separates the hexed string into individual hex bytes
+    hexedList = [hexedKey[i:i+2] for i in range(0, len(hexedKey), 2)]
+
+    return hexedList
 
 
 def getHexedPlainText(plainText):
-    """ Returns the plaintext in hex form and separates it into blocks of 16 into a list. """
+    """ Returns the plaintext in hex form and separates it into blocks of 32 into a list. """
 
     # Creates a list of each character from the plaintext
     plainText = list(plainText)
@@ -92,13 +100,14 @@ def getHexedPlainText(plainText):
         # Adds the appropriate number of 0s onto the end of the hexed plaintext
         hexedPlainText += ("0" * padding)
 
-    # Separates the hexed plaintext into blocks of 32 into a list
+    # Separates the hexed plaintext into blocks of 32
     hexedPlainText32 = [hexedPlainText[i:i+32] for i in range(0, len(hexedPlainText), 32)]
 
     # Separates the individual hex blocks of 32 into pairs of bytes
     hexedPlainTextBytes = []
 
     for h in hexedPlainText32:
+        # Separates each hexed plaintext block into individual hex bytes
         hByte = [h[i:i+2] for i in range(0, len(h), 2)]
         hexedPlainTextBytes.append(hByte)
 
