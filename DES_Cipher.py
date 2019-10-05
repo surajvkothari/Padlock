@@ -145,12 +145,11 @@ def permutateBinaryKey_PC1(key):
     PC_1 = encryptionBlocks.getPC_1()
 
     """
-    Enumerates over the PC1-Block and sets the value, at the current position
-    in the permuted list, to the bit in the position, from the PC1-block,
-    of the key.
+    Iterates over the PC1-Block and the value fetched is the index of the
+    bit in the key to be concatenated onto the permuted binary string.
     """
 
-    for i, pos in enumerate(PC_1):
+    for pos in PC_1:
         permuted += key[pos-1]
 
     return permuted
@@ -219,8 +218,7 @@ def permutateSubKeys(keys):
     # Joins the left and right halves of the sub-keys together into one key
     roundkeys = ["".join(k) for k in keys]
 
-    # Initialises the permuted sub-keys to have a size of 48 bits
-    permutedSubKey = [0 for x in range(48)]
+    permutedSubKey = ""
 
     # Stores the 16 permuted round keys
     setOfSubKeys = []
@@ -234,23 +232,17 @@ def permutateSubKeys(keys):
         key = list(key)
 
         """
-        Enumerates over the PC2-Block and sets the value, at the current
-        position in the permuted list, to the bit in the position,
-        from the PC2-Block, of the key.
+        Iterates over the PC3-Block and the value fetched is the index of the
+        bit in the key to be concatenated onto the permuted binary string.
         """
 
-        for i, pos in enumerate(PC_2, 1):
-            permutedSubKey[i-1] = key[pos-1]
+        for pos in PC_2:
+            permutedSubKey += key[pos-1]
 
-        """
-        Joins the list of permuted sub-keys into a string of binary digits
-        Since the list contains integers of 1 and 0, the items need to be
-        mapped to a string before joining them.
-        """
+        setOfSubKeys.append(permutedSubKey)
 
-        binaryString = "".join(map(str, permutedSubKey))
-
-        setOfSubKeys.append(binaryString)
+        # Resets the permuted sub keys
+        permutedSubKey = ""
 
     return setOfSubKeys
 
@@ -274,23 +266,18 @@ def permutateMessage(message):
     # Creates a list of each bit from the binary message
     message = list(message)
 
-    # Initialises the permuted message to have a size of 64 bits
-    permuted = [0 for x in range(64)]
+    permuted = ""
 
     # Fetches the IP-Block from the encryption blocks module
     IP = encryptionBlocks.getIP()
 
     """
-    Enumerates over the IP-Block and sets the value, at the current position
-    in the permuted list, to the bit in the position, from the IP-block, of
-    the message.
+    Iterates over the IP-Block and the value fetched is the index of the
+    bit in the key to be concatenated onto the permuted binary string.
     """
 
-    for i, pos in enumerate(IP, 1):
-        permuted[i-1] = message[pos-1]
-
-    # Joins the list into a binary string
-    permuted = "".join(permuted)
+    for pos in IP:
+        permuted += message[pos-1]
 
     return permuted
 
