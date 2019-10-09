@@ -18,7 +18,7 @@ import time
 
 
 def getShiftKeyForImage(passKey):
-    """ Returns a list of binary values converted from their hexed representation of the round keys """
+    """ Returns a list of denary values converted from their hexed representation of the round keys """
 
     denaryOfRoundKeys = []
 
@@ -34,10 +34,7 @@ def getShiftKeyForImage(passKey):
         denary = int(wholeRoundKey, 16)
         denaryOfRoundKeys.append(denary)
 
-    # Slices the denary values to get the first 4 digits and converts them back to integers
-    truncatedDenaryValues = [int(str(i)[0:8]) for i in denaryOfRoundKeys]
-
-    return truncatedDenaryValues
+    return denaryOfRoundKeys
 
 
 def getHexedKey(key):

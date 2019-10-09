@@ -28,10 +28,7 @@ def getShiftValuesForImage(passKey):
     # Converts the binary value of each subkey to denary
     denaryOfSubKeys = [int(i, 2) for i in permutedSubKeys]
 
-    # Slices the denary values to get the first 4 digits and converts them back to integers
-    truncatedDenaryValues = [int(str(i)[0:4]) for i in denaryOfSubKeys]
-
-    return truncatedDenaryValues
+    return denaryOfSubKeys
 
 
 def getHexedKey(key):
@@ -232,7 +229,7 @@ def permutateSubKeys(keys):
         key = list(key)
 
         """
-        Iterates over the PC3-Block and the value fetched is the index of the
+        Iterates over the PC2-Block and the value fetched is the index of the
         bit in the key to be concatenated onto the permuted binary string.
         """
 
