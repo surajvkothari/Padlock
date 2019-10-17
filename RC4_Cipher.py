@@ -51,8 +51,8 @@ def KSA(key):
 def getKeyStream(key):
     """ Generates a key stream using the pass key and yields each byte of it """
 
-    # Limits the maximum size of the key to 16 characters
-    key = key[:16]
+    # Limits the maximum size of the key to 32 hex characters
+    key = key[:32]
 
     # Gets the stream cipher
     S = KSA(key)
@@ -85,7 +85,6 @@ def encryptMessage(plaintext, passKey):
     cipherText = ""
 
     for char, S in zip(hexedPlainTextList, getKeyStream(passKey)):
-
         XOR = int(char, 16) ^ int(S, 16)
 
         cipherText += hex(XOR)[2:].zfill(2)

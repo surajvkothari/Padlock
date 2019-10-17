@@ -28,9 +28,9 @@ def getPassKeyString_classic(text, passKey):
 
     passKeyString = ""
 
-    for i, t in enumerate(text, 1):
+    for t in text:
         if t.isalpha():
-            nextKey = next(passKeyCycle)  # Gets the next key
+            nextKey = next(passKeyCycle)  # Gets the next key character
             passKeyString += nextKey
 
         else:
@@ -64,18 +64,14 @@ def getPassKeyString_ASCII(text, passKey):
     (kingkingkingkingki)
     """
 
-    # Gets the whole number of times the pass key is repeated
-    repeatedNum = (len(text) // len(passKey))
+    # A generator cycling through the characters in the pass key
+    passKeyCycle = itertools.cycle(passKey)
 
-    # Gets the remaining characters
-    extraChars = passKey[0:(len(text) % len(passKey))]
+    passKeyString = ""
 
-    """
-    Repeats the original passkey the correct number of times
-    and then concatenates both parts to form the pass-key-string.
-    """
-
-    passKeyString = (passKey * repeatedNum) + extraChars
+    for t in text:
+        nextKey = next(passKeyCycle)  # Gets the next key character
+        passKeyString += nextKey
 
     return passKeyString
 
