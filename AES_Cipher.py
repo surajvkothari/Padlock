@@ -12,7 +12,6 @@ at Woodhouse College.
 import imageCrypt
 import encryptionBlocks
 import base64
-import itertools
 import os
 import time
 
