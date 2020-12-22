@@ -2,7 +2,15 @@
 
 Padlock is a 3 in 1 encryption software that has a wonderful designed GUI which gives access to a number of standard encryption ciphers.
 
-Padlock ranges from Caesar Cipher to AES Cipher. Not only does the software allow users to encrypt and decrypt their messages. The software also has support for file and image encyption/decryption as well.
+Padlock includes:
+- Caesar Cipher
+- Vigenere cipher
+- DES
+- Triple DES
+- AES
+- RC4
+
+Not only does the software allow users to encrypt and decrypt their messages, it also has support for files and images. Images will be saved in their encrypted form and when opened, the pixels would have changed.
 
 ## Getting Started
 
