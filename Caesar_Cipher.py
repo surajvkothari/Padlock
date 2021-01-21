@@ -36,14 +36,6 @@ def getShiftKey_CLASSIC(passKey):
         if chr.isalpha():  # Only alphabetical characters are used in the total
             Letter_sum += alphabet.index(chr.lower()) + 1
 
-    """
-    If the shift key value generated is a multiple of 26, then add 50 to it
-    as a shift of 26 would obtain the same character.
-    """
-
-    if Letter_sum % 26 == 0:
-        Letter_sum += 50
-
     return Letter_sum
 
 
@@ -54,14 +46,6 @@ def getShiftKey_ASCII(passKey):
 
     for chr in passKey:
         ASCII_sum += ord(chr)
-
-    """
-    If the shift key value generated is a multiple of 95, then add 50 to it
-    as a shift of 95 would obtain the same character.
-    """
-
-    if ASCII_sum % 95 == 0:
-        ASCII_sum += 50
         
     return ASCII_sum
 
