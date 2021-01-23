@@ -237,7 +237,7 @@ def loadEncryption(filename, filepath, originalImage, imageFormat, shifts, ciphe
     not beneficial when decrypting.
     """
 
-    newFilename = "{}/{}_{}ENC.png".format(filepath, filename[:-4], cipherUsed)
+    newFilename = "{}/{}_{}_ENC.png".format(filepath, filename[:-4], cipherUsed)
 
     # Saves the encrypted image and then close it
     copyImage.save(newFilename)
@@ -286,7 +286,7 @@ def loadDecryption(filename, filepath, shifts, cipherUsed):
     if "ENC" in filename:
         newFilename = "{}/{}".format(filepath, filename.replace("ENC", "DEC"))
     else:
-        newFilename = "{}/{}_{}DEC.png".format(filepath, filename[:-4], cipherUsed)
+        newFilename = "{}/{}_{}_DEC.png".format(filepath, filename[:-4], cipherUsed)
 
     # Saves the encrypted image
     copyImage.save(newFilename)
