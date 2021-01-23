@@ -227,10 +227,6 @@ def loadEncryption(filename, filepath, originalImage, imageFormat, shifts, ciphe
     # Closes the original image
     originalImage.close()
 
-    # Rotates and flips the image to make the encrypted image more different than the original
-    copyImage = copyImage.rotate(180)
-    copyImage = copyImage.transpose(Image.FLIP_LEFT_RIGHT)
-
     """
     All the filenames are saved as .png, as JPG files perform
     lossy compression. This alters the encrypted pixels and is
@@ -251,10 +247,6 @@ def loadDecryption(filename, filepath, shifts, cipherUsed):
 
     full_filename = filepath + "/" + filename
     inputImage = Image.open(full_filename)
-
-    # Rotates and flips the image back to its original orientation
-    inputImage = inputImage.transpose(Image.FLIP_LEFT_RIGHT)
-    inputImage = inputImage.rotate(180)
 
     """
     Gets a pixel access object for the input image
