@@ -2002,7 +2002,11 @@ class DecryptMenu(tk.Frame):
             c = self.inputBox.get()
             k = self.keyBox.get()
 
+            # Configure output box as normal
+            self.outputBox.configure(state="normal", cursor="xterm")
+            # Delete contents of output box
             self.outputBox.delete("1.0", "end")
+            # Disable output box
             self.outputBox.configure(state="disabled", cursor="X_cursor")
             self.error.grid(sticky="w", pady=(5, 0))
 
@@ -2034,14 +2038,22 @@ class DecryptMenu(tk.Frame):
             except Exception as exc:
                 print(exc)
 
+                # Configure output box to show error message
                 self.outputBox.configure(state="normal", cursor="xterm", fg=Colours.ERROR)
                 self.outputBox.insert("1.0", "ERROR: Decryption failed.")
-                self.outputBox.configure(state="disabled", cursor="X_cursor", fg=Colours.ERROR)
+                self.outputBox.configure(state="disabled", cursor="X_cursor")
                 self.copyButton2.configure(state="disabled", bg=Colours.GREY_FOREGROUND, fg=Colours.WHITE)
 
             else:
-                self.outputBox.configure(state="normal", cursor="xterm")
+                # Configure output box as normal
+                self.outputBox.configure(state="normal", cursor="xterm", fg=Colours.GREY_FOREGROUND)
+                # Insert plaintext into output box
                 self.outputBox.insert("1.0", plainText)
+                self.outputBox.configure(state="disabled", cursor="X_cursor")
+
+                # Revert copy button to normal
+                self.copyButton2.configure(state="normal", cursor="hand2", bg="#2196F3", fg=Colours.WHITE)
+
 
         def copyInputToClipboard():
             i = self.inputBox.get()
