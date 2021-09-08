@@ -46,7 +46,8 @@ def getShiftKey_ASCII(passKey):
 
     for chr in passKey:
         ASCII_sum += ord(chr)
-        
+
+    
     return ASCII_sum
 
 

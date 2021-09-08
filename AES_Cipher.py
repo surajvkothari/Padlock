@@ -107,6 +107,7 @@ def getHexedPlainText(plainText):
         hByte = [h[i:i+2] for i in range(0, len(h), 2)]
         hexedPlainTextBytes.append(hByte)
 
+
     return hexedPlainTextBytes
 
 

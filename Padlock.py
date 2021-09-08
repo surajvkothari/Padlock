@@ -1173,7 +1173,9 @@ class EncryptMenu(tk.Frame):
         self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
         self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
-        self.upload_fileButton = tk.Button(self.subFrame, text="UPLOAD TEXT FILE", compound="left", image=self.IMAGE_UPLOAD,
+
+        uploadFileBtnText = "UPLOAD FILE" if self.cipherMode == "Base64" else "UPLOAD TEXT FILE"
+        self.uploadFileBtn = tk.Button(self.subFrame, text=uploadFileBtnText, compound="left", image=self.IMAGE_UPLOAD,
         command=lambda: uploadFile(), **ButtonStyle.UPLOAD_BUTTON)
         self.fileInfo = tk.Label(self.subFrame, textvariable=self.fileInfo_text, wraplength=300, justify="left",
             bg=Colours.WHITE, fg=Colours.INFO, font=Fonts.INFO)
@@ -1184,8 +1186,8 @@ class EncryptMenu(tk.Frame):
         self.subFrame3 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.cipherLabel = tk.Label(self.subFrame3, text=self.cipher, bg=Colours.WHITE, fg=Colours.CIPHER_FG,
             font=Fonts.TITLE)
-        self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
 
+        self.horizontalSeparator2 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame4 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
         self.subtext = tk.Label(self.subFrame4, text="KEY", bg=Colours.WHITE, fg=Colours.SMALL_TITLE, font=Fonts.TITLE2)
         self.keyBox = tk.Entry(self.subFrame4, width=22, relief="flat", font=Fonts.KEY_TEXT, highlightthickness="1",
@@ -1212,7 +1214,7 @@ class EncryptMenu(tk.Frame):
 
         self.inputFrame.grid(padx=50, sticky="ns")
         self.subFrame.grid(sticky="w")
-        self.upload_fileButton.grid(padx=10, pady=10)
+        self.uploadFileBtn.grid(padx=10, pady=10)
 
         self.controlFrame.grid(column=1, row=0, padx=50, sticky="n")
         self.subFrame3.grid(sticky="w")
@@ -1238,9 +1240,9 @@ class EncryptMenu(tk.Frame):
             bg=ButtonStyle.ENCRYPT2_BUTTON["activebackground"]))
         self.encryptButton.bind("<Leave>", lambda e: self.encryptButton.configure(
             bg=ButtonStyle.ENCRYPT2_BUTTON["bg"]))
-        self.upload_fileButton.bind("<Enter>", lambda e: self.upload_fileButton.configure(
+        self.uploadFileBtn.bind("<Enter>", lambda e: self.uploadFileBtn.configure(
             bg=ButtonStyle.UPLOAD_BUTTON["activebackground"]))
-        self.upload_fileButton.bind("<Leave>", lambda e: self.upload_fileButton.configure(
+        self.uploadFileBtn.bind("<Leave>", lambda e: self.uploadFileBtn.configure(
             bg=ButtonStyle.UPLOAD_BUTTON["bg"]))
 
     def fileSectionForTripleDES(self):
@@ -1402,7 +1404,9 @@ class EncryptMenu(tk.Frame):
         self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
         self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
-        self.upload_fileButton = tk.Button(self.subFrame, text="UPLOAD TEXT FILE", compound="left", image=self.IMAGE_UPLOAD,
+
+        uploadFileBtnText = "UPLOAD FILE" if self.cipherMode == "Base64" else "UPLOAD TEXT FILE"
+        self.uploadFileBtn = tk.Button(self.subFrame, text=uploadFileBtnText, compound="left", image=self.IMAGE_UPLOAD,
         command=lambda: uploadFile(), **ButtonStyle.UPLOAD_BUTTON)
         self.fileInfo = tk.Label(self.subFrame, textvariable=self.fileInfo_text, wraplength=400, justify="left",
             bg=Colours.WHITE, fg=Colours.INFO, font=Fonts.INFO)
@@ -1459,7 +1463,7 @@ class EncryptMenu(tk.Frame):
 
         self.inputFrame.grid(padx=50, sticky="ns")
         self.subFrame.grid(sticky="w")
-        self.upload_fileButton.grid(padx=10, pady=10)
+        self.uploadFileBtn.grid(padx=10, pady=10)
 
         self.controlFrame.grid(column=1, row=0, padx=50, sticky="n")
         self.subFrame3.grid(sticky="w")
@@ -1493,9 +1497,9 @@ class EncryptMenu(tk.Frame):
             bg=ButtonStyle.ENCRYPT2_BUTTON["activebackground"]))
         self.encryptButton.bind("<Leave>", lambda e: self.encryptButton.configure(
             bg=ButtonStyle.ENCRYPT2_BUTTON["bg"]))
-        self.upload_fileButton.bind("<Enter>", lambda e: self.upload_fileButton.configure(
+        self.uploadFileBtn.bind("<Enter>", lambda e: self.uploadFileBtn.configure(
             bg=ButtonStyle.UPLOAD_BUTTON["activebackground"]))
-        self.upload_fileButton.bind("<Leave>", lambda e: self.upload_fileButton.configure(
+        self.uploadFileBtn.bind("<Leave>", lambda e: self.uploadFileBtn.configure(
             bg=ButtonStyle.UPLOAD_BUTTON["bg"]))
 
     def imageSection(self):
@@ -1991,6 +1995,7 @@ class DecryptMenu(tk.Frame):
             else:
                 self.imageSection()
 
+
     def messageSection(self):
         def updateOutputBox():
             """
@@ -2061,6 +2066,7 @@ class DecryptMenu(tk.Frame):
 
             self.master.clipboard_clear()
             self.master.clipboard_append(i)
+
 
         def copyOutputToClipboard():
             o = self.outputBox.get("1.0", "end")
@@ -2207,12 +2213,13 @@ class DecryptMenu(tk.Frame):
         self.copyButton2.bind("<Leave>", lambda e: self.copyButton2.configure(
             bg=ButtonStyle.COPY_BUTTON["bg"]))
 
+
     def messageSectionForTripleDES(self):
         def updateOutputBox():
             """
             Gets the contents of the input and key boxes, then checks them for
             validation, before retrieving the plaintext from the
-            multicrypt module. Lastly, the plaintext is placed in the output box
+            multicrypt module. The plaintext is then placed in the output box.
             """
 
             c = self.inputBox.get()
@@ -2220,7 +2227,11 @@ class DecryptMenu(tk.Frame):
             k2 = self.keyBox2.get()
             k3 = self.keyBox3.get()
 
+            # Configure output box as normal
+            self.outputBox.configure(state="normal", cursor="xterm")
+            # Delete contents of output box
             self.outputBox.delete("1.0", "end")
+            # Disable output box
             self.outputBox.configure(state="disabled", cursor="X_cursor")
             self.error.grid(sticky="w", pady=(5, 0))
 
@@ -2264,14 +2275,22 @@ class DecryptMenu(tk.Frame):
             except Exception as exc:
                 print(exc)
 
+                # Configure output box to show error message
                 self.outputBox.configure(state="normal", cursor="xterm", fg=Colours.ERROR)
                 self.outputBox.insert("1.0", "ERROR: Decryption failed.")
-                self.outputBox.configure(state="disabled", cursor="X_cursor", fg=Colours.ERROR)
+                self.outputBox.configure(state="disabled", cursor="X_cursor")
                 self.copyButton2.configure(state="disabled", bg=Colours.GREY_FOREGROUND, fg=Colours.WHITE)
 
             else:
-                self.outputBox.configure(state="normal", cursor="xterm")
+                # Configure output box as normal
+                self.outputBox.configure(state="normal", cursor="xterm", fg=Colours.GREY_FOREGROUND)
+                # Insert plaintext into output box
                 self.outputBox.insert("1.0", plainText)
+                self.outputBox.configure(state="disabled", cursor="X_cursor")
+
+                # Revert copy button to normal
+                self.copyButton2.configure(state="normal", cursor="hand2", bg="#2196F3", fg=Colours.WHITE)
+
 
         def copyInputToClipboard():
             i = self.inputBox.get()
@@ -2279,6 +2298,7 @@ class DecryptMenu(tk.Frame):
 
             self.master.clipboard_clear()
             self.master.clipboard_append(i)
+
 
         def copyOutputToClipboard():
             o = self.outputBox.get("1.0", "end")
@@ -2370,9 +2390,9 @@ class DecryptMenu(tk.Frame):
 
         self.horizontalSeparator5 = tk.ttk.Separator(self.controlFrame, orient="horizontal")
         self.subFrame7 = tk.Frame(self.controlFrame, bg=Colours.WHITE)
-        self.decryptButton = tk.Button(self.subFrame6, text="Decrypt", command=lambda: updateOutputBox(),
+        self.decryptButton = tk.Button(self.subFrame7, text="Decrypt", command=lambda: updateOutputBox(),
             **ButtonStyle.DECRYPT2_BUTTON)
-        self.error = tk.Label(self.subFrame6, textvariable=self.errorMessage, wraplength=200, justify="left",
+        self.error = tk.Label(self.subFrame7, textvariable=self.errorMessage, wraplength=200, justify="left",
             bg=Colours.WHITE, fg=Colours.ERROR, font=Fonts.ERROR)
 
         """Output frame section"""
@@ -2565,7 +2585,7 @@ class DecryptMenu(tk.Frame):
         self.sectionTag3.grid(column=4, row=0, pady=(10, 0), padx=10)
         self.sectionTag4.grid(column=5, row=0, sticky="ns", ipadx=40, pady=(10, 0), padx=10)
 
-        # add_cascade an event handler for the tag to act like a link when clicked
+        # Adds an event handler for the tag to act like a link when clicked
         self.homeTag.bind("<Button-1>", lambda e: self.master.switch_frame(HomePage))
         self.sectionTag.bind("<Button-1>", lambda e: self.master.switch_frame(FormatSelctionMenu, process=self.process))
         self.sectionTag2.bind("<Button-1>", lambda e: self.master.switch_frame(CipherMenu, process=self.process,
@@ -2578,7 +2598,9 @@ class DecryptMenu(tk.Frame):
         self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
         self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
-        self.upload_fileButton = tk.Button(self.subFrame, text="UPLOAD TEXT FILE", compound="left", image=self.IMAGE_UPLOAD,
+
+        uploadFileBtnText = "UPLOAD FILE" if self.cipherMode == "Base64" else "UPLOAD TEXT FILE"
+        self.uploadFileBtn = tk.Button(self.subFrame, text=uploadFileBtnText, compound="left", image=self.IMAGE_UPLOAD,
         command=lambda: uploadFile(), **ButtonStyle.UPLOAD_BUTTON)
         self.fileInfo = tk.Label(self.subFrame, textvariable=self.fileInfo_text, wraplength=400, justify="left",
             bg=Colours.WHITE, fg=Colours.INFO, font=Fonts.INFO)
@@ -2617,7 +2639,7 @@ class DecryptMenu(tk.Frame):
 
         self.inputFrame.grid(padx=50, sticky="ns")
         self.subFrame.grid(sticky="w")
-        self.upload_fileButton.grid(padx=10, pady=10)
+        self.uploadFileBtn.grid(padx=10, pady=10)
 
         self.controlFrame.grid(column=1, row=0, padx=50, sticky="n")
         self.subFrame3.grid(sticky="w")
@@ -2643,9 +2665,9 @@ class DecryptMenu(tk.Frame):
             bg=ButtonStyle.DECRYPT2_BUTTON["activebackground"]))
         self.decryptButton.bind("<Leave>", lambda e: self.decryptButton.configure(
             bg=ButtonStyle.DECRYPT2_BUTTON["bg"]))
-        self.upload_fileButton.bind("<Enter>", lambda e: self.upload_fileButton.configure(
+        self.uploadFileBtn.bind("<Enter>", lambda e: self.uploadFileBtn.configure(
             bg=ButtonStyle.UPLOAD_BUTTON["activebackground"]))
-        self.upload_fileButton.bind("<Leave>", lambda e: self.upload_fileButton.configure(
+        self.uploadFileBtn.bind("<Leave>", lambda e: self.uploadFileBtn.configure(
             bg=ButtonStyle.UPLOAD_BUTTON["bg"]))
 
     def fileSectionForTripleDES(self):
@@ -2798,7 +2820,9 @@ class DecryptMenu(tk.Frame):
         self.inputFrame = tk.Frame(self, bg=Colours.WHITE)
         self.subFrame = tk.Frame(self.inputFrame, bg=Colours.WHITE)
         self.horizontalSeparator = tk.ttk.Separator(self.inputFrame, orient="horizontal")
-        self.upload_fileButton = tk.Button(self.subFrame, text="UPLOAD TEXT FILE", compound="left", image=self.IMAGE_UPLOAD,
+
+        uploadFileBtnText = "UPLOAD FILE" if self.cipherMode == "Base64" else "UPLOAD TEXT FILE"
+        self.uploadFileBtn = tk.Button(self.subFrame, text=uploadFileBtnText, compound="left", image=self.IMAGE_UPLOAD,
         command=lambda: uploadFile(), **ButtonStyle.UPLOAD_BUTTON)
         self.fileInfo = tk.Label(self.subFrame, textvariable=self.fileInfo_text, wraplength=400, justify="left",
             bg=Colours.WHITE, fg=Colours.INFO, font=Fonts.INFO)
@@ -2856,7 +2880,7 @@ class DecryptMenu(tk.Frame):
 
         self.inputFrame.grid(padx=50, sticky="ns")
         self.subFrame.grid(sticky="w")
-        self.upload_fileButton.grid(padx=10, pady=10)
+        self.uploadFileBtn.grid(padx=10, pady=10)
 
         self.controlFrame.grid(column=1, row=0, padx=50, sticky="n")
         self.subFrame3.grid(sticky="w")
@@ -2890,9 +2914,9 @@ class DecryptMenu(tk.Frame):
             bg=ButtonStyle.DECRYPT2_BUTTON["activebackground"]))
         self.decryptButton.bind("<Leave>", lambda e: self.decryptButton.configure(
             bg=ButtonStyle.DECRYPT2_BUTTON["bg"]))
-        self.upload_fileButton.bind("<Enter>", lambda e: self.upload_fileButton.configure(
+        self.uploadFileBtn.bind("<Enter>", lambda e: self.uploadFileBtn.configure(
             bg=ButtonStyle.UPLOAD_BUTTON["activebackground"]))
-        self.upload_fileButton.bind("<Leave>", lambda e: self.upload_fileButton.configure(
+        self.uploadFileBtn.bind("<Leave>", lambda e: self.uploadFileBtn.configure(
             bg=ButtonStyle.UPLOAD_BUTTON["bg"]))
 
     def imageSection(self):

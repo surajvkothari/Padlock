@@ -23,7 +23,7 @@ def getHexedPlainText(plainText):
 
     # Converts each character, in the plaintext, to hex from the list
     hexedPlainTextList = [hex(ord(char))[2:] for char in plainText]
-
+    
     return hexedPlainTextList
 
 
